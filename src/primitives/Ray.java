@@ -1,14 +1,37 @@
 package primitives;
 
+/**
+ * This class represents a ray in 3D space. A ray originates from a point (head) and extends infinitely in a specific direction (normalized vector).
+ */
 public class Ray {
+
+    /**
+     * Field representing the starting point (head) of the ray.
+     */
     Point head;
+
+    /**
+     * Field representing the direction of the ray as a normalized vector.
+     */
     Vector direction;
 
+    /**
+     * Constructor that initializes the ray with a starting point (head) and a direction vector.
+     *
+     * @param head The Point object representing the starting point of the ray.
+     * @param direction The Vector object representing the direction of the ray. The direction vector is normalized before being assigned.
+     */
     public Ray(Point head, Vector direction) {
         this.head = head;
         this.direction = direction.normalize();
     }
 
+    /**
+     * Checks if two rays are equal by comparing their head points and direction vectors.
+     *
+     * @param obj The object to compare with.
+     * @return True if the objects are equal (same head point and direction vector), false otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -17,6 +40,11 @@ public class Ray {
                 && this.direction.equals(other.direction);
     }
 
+    /**
+     * Returns a string representation of the ray in the format "Ray [head=<point coordinates>, direction=<vector components>]".
+     *
+     * @return The string representation of the ray.
+     */
     @Override
     public String toString() {
         return "Ray [head=" + head + ", direction=" + direction + "]";
