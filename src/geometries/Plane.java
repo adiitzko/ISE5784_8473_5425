@@ -37,7 +37,7 @@ public class Plane implements Geometry  {
 
         @Override
         public Vector getNormal(Point _p) {
-            return normal;
+            return this.normal;
         }
 
     /**
