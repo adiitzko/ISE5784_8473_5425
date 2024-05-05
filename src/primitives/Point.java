@@ -1,6 +1,7 @@
 package primitives;
 
 public class Point {
+    public static Point ZERO;
     protected final Double3 xyz;
 
     public Point(double x, double y, double z) {
@@ -27,7 +28,7 @@ public class Point {
         return new Point(xyz.add(vector.xyz));
     }
 
-    public Point subtract(Point otherPoint) {
+    public Vector subtract(Point otherPoint) {
         if(xyz.equals(otherPoint.xyz))
             throw new IllegalArgumentException("Error: Subtraction of two equal vectors results a zero vector");
         return new Vector(xyz.subtract(otherPoint.xyz));
