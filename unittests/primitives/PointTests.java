@@ -7,26 +7,18 @@ import static org.junit.jupiter.api.Assertions.*;
 class PointTests {
 
     @Test
-    void testEquals() {
+    void testAdd() {
     }
 
     @Test
-    void testToString() {
+    void testSubtract() {
     }
 
     @Test
-    void add() {
+    void testDistanceSquared() {
     }
 
     @Test
-    void subtract() {
-    }
-
-    @Test
-    void distanceSquared() {
-    }
-
-    @Test
-    void distance() {
+    void testDistance() {
     }
 }

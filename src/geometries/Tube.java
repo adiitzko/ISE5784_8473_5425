@@ -12,7 +12,7 @@ import primitives.Ray;
 public class Tube extends RadialGeometry {
 
     /** The axis ray of the tube */
-    private final Ray _axisRay;
+   private final Ray axisRay;
 
     /**
      * Constructs a tube with the given axis ray and radius.
@@ -21,13 +21,13 @@ public class Tube extends RadialGeometry {
      */
     public Tube(Ray axisRay, double radius) {
         super(radius);
-        this._axisRay = axisRay;
+        this.axisRay = axisRay;
     }
 
     /**
      * Gets the normal vector to the tube at a specified point.
      *
-     * @param point A point on the surface of the tube.
+     * @param _p A point on the surface of the tube.
      * @return The normal vector to the tube.
      */
     @Override

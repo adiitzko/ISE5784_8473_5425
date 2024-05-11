@@ -72,6 +72,8 @@ public class Vector extends Point{
         return new Vector(this.xyz.add(vec.xyz));
     }
 
+
+
     /**
      * Scales the vector by a scalar factor, resulting in a new vector with the scaled coordinates.
      *
