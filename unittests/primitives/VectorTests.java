@@ -25,7 +25,7 @@ class VectorTests {
                 Vector v3=new Vector(-1,-1,-1);
                 Vector v4=new Vector(1,1,1);
                 v3.add(v4);
-                fail("Vector (0,0,0) shouldnt be valid");
+                fail("Vector (0,0,0) shouldn't be valid");
             }
             catch  (IllegalArgumentException e)
             {
@@ -74,7 +74,7 @@ class VectorTests {
     void testLength() {
         // ============ Equivalence Partitions Tests ==============
         Vector v1 = new Vector(1, 2, 3);
-        assertTrue( isZero(v1.length()-Math.sqrt(14)), "Wrong length squared caculate");
+        assertTrue( isZero(v1.length()-Math.sqrt(14)), "Wrong length squared calculate");
     }
 
     /**
@@ -84,7 +84,7 @@ class VectorTests {
     void testLengthSquared() {
         // ============ Equivalence Partitions Tests ==============
         Vector v1 = new Vector(1, 2, 3);
-        assertTrue(isZero(v1.lengthSquared()-14 ), "Wrong length squared caculate" );
+        assertTrue(isZero(v1.lengthSquared()-14 ), "Wrong length squared calculate" );
     }
 
     /**
