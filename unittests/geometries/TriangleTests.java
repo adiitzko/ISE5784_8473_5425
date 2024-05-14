@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * test class to check all function of triangle class
  */
- class TriangleTests {
+class TriangleTests {
     /**
      * get normal
      */

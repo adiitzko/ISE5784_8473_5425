@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import geometries.Polygon;
+
 import primitives.Point;
 import primitives.Vector;
 
@@ -17,7 +17,7 @@ public class PolygonTests {
      * Delta value for accuracy when comparing the numbers of type 'double' in
      * assertEquals
      */
-    private final double DELTA = 0.000001;
+     final double DELTA = 0.000001;
 
     /** Test method for {@link geometries.Polygon#Polygon(primitives.Point...)}. */
     @Test
