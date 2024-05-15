@@ -8,12 +8,12 @@ public class Ray {
     /**
      * Field representing the starting point (head) of the ray.
      */
-    Point head;
+    public Point head;
 
     /**
      * Field representing the direction of the ray as a normalized vector.
      */
-    Vector direction;
+    public Vector direction;
 
     /**
      * Constructor that initializes the ray with a starting point (head) and a direction vector.
