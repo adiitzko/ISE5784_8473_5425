@@ -27,6 +27,16 @@ public class Ray {
     }
 
     /**
+     * get point on the ray
+     *
+     * @param t distance from the start of the ray
+     * @return new Point3D
+     */
+    public Point getPoint(double t) {
+        return Util.isZero(t) ? head : head.add(direction.scale(t));
+    }
+
+    /**
      * Checks if two rays are equal by comparing their head points and direction vectors.
      *
      * @param obj The object to compare with.
