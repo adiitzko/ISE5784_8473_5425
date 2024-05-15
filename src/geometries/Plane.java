@@ -17,13 +17,17 @@ public class Plane implements Geometry  {
      * @param p3 The third point on the plane.
      */
         public Plane(Point p1, Point p2, Point p3) {
-            this.normal = null;
-            this.p = p1;
+            p = p1;
+            try { // try for case the consructor get all point on the same vector or at least two point are the same
+                normal = p1.subtract(p2).crossProduct(p1.subtract(p3)).normalize();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("your points are on the same vector");
+            }
         }
     /**
      * Constructs a plane from a point and a normal vector.
-     * @param p      A point on the plane.
-     * @param normal The normal vector to the plane.
+     * @param _p      A point on the plane.
+     * @param _normal The normal vector to the plane.
      */
         public Plane(Point _p, Vector _normal) {
             this.p = _p;
@@ -31,7 +35,7 @@ public class Plane implements Geometry  {
         }
     /**
      * Gets the normal vector to the plane at a specified point.
-     * @param point A point on the surface of the plane (unused).
+     * @param _p A point on the surface of the plane (unused).
      * @return The normal vector to the plane.
      */
 

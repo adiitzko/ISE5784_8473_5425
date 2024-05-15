@@ -134,7 +134,6 @@ public class Vector extends Point{
      * @throws ArithmeticException If the vector length is zero (division by zero).
      */
     public Vector normalize() {
-        Vector vec = new Vector(this.xyz);
-        return vec.scale(1/this.length());
+        return new Vector(this.xyz.reduce(this.length()));
     }
 }

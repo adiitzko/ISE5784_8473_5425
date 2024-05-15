@@ -2,6 +2,7 @@ package geometries;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Util;
 import primitives.Vector;
 
 /**
@@ -33,8 +34,27 @@ public class Cylinder extends Tube {
      * @return The normal vector to the cylinder.
      */
     @Override
-    public Vector getNormal(Point _p) {
-        return super.getNormal(_p);
+    public Vector getNormal(Point point) {
+        Point p0 = axisRay.head;
+        Vector dir = axisRay.direction;
+        double t;
+        // if the point is at the base of the cylinder
+        try {
+            t = dir.dotProduct(point.subtract(p0));
+            if (Util.isZero(t))
+                return dir.scale(-1);
+        } catch (IllegalArgumentException ignore) {
+            // the point is in the center of the base
+            return dir.scale(-1);
+        }
+
+        // if the point is at the top of the cylinder
+        if (Util.isZero(t - _height))
+            return dir;
+        if (Util.isZero(dir.dotProduct(point.subtract(p0))))
+            return dir;
+
+        return super.getNormal(point);
     }
 
 }

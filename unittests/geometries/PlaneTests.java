@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
         // check constructor all point on the same line
         assertThrows(IllegalArgumentException.class,
-                () -> new Plane(new Point(1, 2, 6.3), new Point(2, 4, 12.6), new Point(0.5, 1, 3.15)),
+                () -> new Plane(new Point(1, 2, 3), new Point(2, 4, 6), new Point(0.5, 1, 1.5)),
                 "ERROR: ctor get all point on the same line");
     }
 

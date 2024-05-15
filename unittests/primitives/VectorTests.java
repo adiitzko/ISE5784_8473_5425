@@ -92,11 +92,12 @@ class VectorTests {
      */
     @Test
     void testNormalize() {
+        Vector v = new Vector(0, 3, 4);
+        Vector n = v.normalize();
         // ============ Equivalence Partitions Tests ==============
-        Vector v1 = new Vector(1, 2, 3);
-        Vector normalized =v1.normalize();
-        assertTrue( v1==normalized,"normalize function creates a new vector");
-        assertTrue(isZero(normalized.length()-1),"normalize result is not a unit vector");
+        // TC01: Simple test
+        assertEquals( 1d, n.lengthSquared(), 0.00001,"wrong normalized vector length");
+        assertEquals( new Vector(0, 0.6, 0.8), n,"wrong normalized vector");
     }
 
     /**
