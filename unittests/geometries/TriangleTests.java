@@ -30,6 +30,7 @@ class TriangleTests {
      * behavior
      * in different scenarios.
      */
+    @Test
     void testFindIntersections() {
 
         Triangle triangle = new Triangle(new Point(0, 0, 1), new Point(1, 0, 0), new Point(-1, 0, 0));

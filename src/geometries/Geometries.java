@@ -2,7 +2,7 @@ package geometries;
 
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.ArrayList;
 import primitives.Point;
 import primitives.Ray;
 
@@ -14,7 +14,7 @@ import primitives.Ray;
  */
 public class Geometries implements Intersectable {
 
-    private List<Intersectable> geometList = new LinkedList<>();
+    private final List<Intersectable> geometList = new LinkedList<>();
 
     /**
      * The default constructor (the list will be empty)
@@ -44,16 +44,18 @@ public class Geometries implements Intersectable {
 
     @Override
     public List<Point> findIntersections(Ray ray){
-        List<Point> intersectionList = null;
-
-        for (Intersectable geometry : this.geometList) {
-            List<Point> tempIntersections = geometry.findIntersections(ray);
-            if (geometry.findIntersections(ray) != null) {
-                if (intersectionList == null)
-                    intersectionList = new LinkedList<>();
-                intersectionList.addAll(tempIntersections);
-            }
+        if(this.geometList.isEmpty())
+            return null;
+        List<Point> temp = new ArrayList<Point>();
+        for (Intersectable intersectable : geometList)
+        {
+            List<Point> intersection = intersectable.findIntersections(ray);
+            if (intersection != null)
+                temp.addAll(intersection);
         }
-        return intersectionList;
+
+        if (temp.isEmpty())
+            return null;
+        return temp;
     }
 }

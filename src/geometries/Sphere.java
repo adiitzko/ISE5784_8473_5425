@@ -1,10 +1,10 @@
 package geometries;
+import java.util.List;
 
 import primitives.Point;
-import primitives.Vector;
-import java.util.List;
 import primitives.Ray;
 import primitives.Util;
+import primitives.Vector;
 
 /**
  * Represents a sphere in three-dimensional space.
@@ -34,47 +34,38 @@ public class Sphere extends RadialGeometry {
         return point.subtract(_center).normalize();
     }
 
+
     @Override
     public List<Point> findIntersections(Ray ray) {
-        Point p0 = ray.head;
-        Vector v = ray.direction.subtract(_center);
-        Vector u;
-
-        try {
-            u = _center.subtract(p0); // p0 == center the ray start from the center of the sphere
-        } catch (IllegalArgumentException e) {
-            return List.of(Util.isZero(this._radius) ? p0 : p0.add(ray.direction.scale(this._radius)));
+        // if the ray starts at the center of the sphere
+        double tm = 0;
+        double d = 0;
+        if (!_center.equals(ray.head)){ // if the ray doesn't start at the center of the sphere
+            Vector L = _center.subtract(ray.head);
+            tm = L.dotProduct(ray.direction);
+            d =L.lengthSquared() - tm * tm; // d = (|L|^2 - tm^2)
+            if (d < 0)
+                d = -d;
+            d = Math.sqrt(d);
         }
-
-        double tm = Util.alignZero(v.dotProduct(u));
-        double dSquared = u.lengthSquared() - tm * tm;
-        double thSquared = Util.alignZero(this._radius * this._radius - dSquared);
-
-        if (thSquared <= 0)
-            return null;// no intersections
-
-        double th = Util.alignZero(Math.sqrt(thSquared));
-        if (th == 0)
-            return null;// ray tangent to sphere
-
-        double t1 = Util.alignZero(tm - th);
-        double t2 = Util.alignZero(tm + th);
-
-        // ray starts after sphere
-        if (Util.alignZero(t1) <= 0 && Util.alignZero(t2) <= 0)
+        if (d > _radius) // if the ray doesn't intersect the sphere
             return null;
-
-        // 2 intersections
-        if (Util.alignZero(t1) > 0 && Util.alignZero(t2) > 0) {
-            // P1 , P2
-            return List.of(Util.isZero(t1) ? p0 : p0.add(ray.direction.scale(t1)),
-                    Util.isZero(t2) ? p0 : p0.add(ray.direction.scale(t2)));
+        // computing the distance from the ray's start point to the intersection points
+        double th = Math.sqrt(_radius * _radius - d * d);
+        double t1 = tm - th;
+        double t2 = tm + th;
+        if (t1 <= 0 && t2 <= 0)
+            return null;
+        if (Util.alignZero(t2) == 0) // if the ray is tangent to the sphere
+            return null;
+        if (th == 0)
+            return null;
+        if (t1 <= 0){ // if the ray starts inside the sphere or the ray starts after the sphere
+            return List.of(ray.getPoint(t2));
         }
-
-        // 1 intersection
-        if (Util.alignZero(t1) > 0)
-            return List.of(Util.isZero(t1) ? p0 : ray.getPoint(t1));
-        else
-            return List.of(Util.isZero(t2) ? p0 : ray.getPoint(t2));
+        if (t2 <= 0) { //if the ray starts after the sphere
+            return List.of(ray.getPoint(t1));
+        }
+        return List.of(ray.getPoint(t1), ray.getPoint(t2)); // if the ray intersects the sphere twice
     }
 }
