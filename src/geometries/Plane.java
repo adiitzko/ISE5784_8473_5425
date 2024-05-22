@@ -21,7 +21,7 @@ public class Plane implements Geometry {
      */
         public Plane(Point p1, Point p2, Point p3) {
             p = p1;
-            try { // try for case the consructor get all point on the same vector or at least two point are the same
+            try { // try for case the constructor get all point on the same vector or at least two point are the same
                 normal = p1.subtract(p2).crossProduct(p1.subtract(p3)).normalize();
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("your points are on the same vector");
@@ -92,7 +92,7 @@ public class Plane implements Geometry {
             // po ray and
             // directionRayScale (which calculates the distance between the point and the
             // surface in the given direction)
-            return List.of(rayP0.add(rayDirection.scale(directionRayScale)));
+            return List.of(ray.getPoint(directionRayScale));
         }
 
         return null;

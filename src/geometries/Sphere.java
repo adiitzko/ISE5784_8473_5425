@@ -73,8 +73,8 @@ public class Sphere extends RadialGeometry {
 
         // 1 intersection
         if (Util.alignZero(t1) > 0)
-            return List.of(Util.isZero(t1) ? p0 : p0.add(ray.direction.scale(t1)));
+            return List.of(Util.isZero(t1) ? p0 : ray.getPoint(t1));
         else
-            return List.of(Util.isZero(t2) ? p0 : p0.add(ray.direction.scale(t2)));
+            return List.of(Util.isZero(t2) ? p0 : ray.getPoint(t2));
     }
 }
