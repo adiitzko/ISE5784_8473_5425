@@ -1,9 +1,10 @@
 package renderer;
-import static primitives.Util.*;
+
+import primitives.Point;
+import primitives.Vector;
+import primitives.Ray;
 
 import java.util.MissingResourceException;
-
-import primitives.*;
 
 /**
  * This class represents a Camera with various attributes such as location, direction vectors,
@@ -12,66 +13,89 @@ import primitives.*;
  * interface to allow cloning of Camera objects.
  */
 public class Camera implements Cloneable {
-    private Point p0;    //location
+    private Point p0;    // location
     private Vector vUp, vTo, vRight;
-    private double width=0, height=0, distance=0;
+    private double width = 0, height = 0, distance = 0;
+
+    @Override
+    public Camera clone() {
+        try {
+            return (Camera) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning not supported", e);
+        }
+    }
 
     /**
-     * point p0
-     * @return p0
+     * Returns the location of the Camera.
+     *
+     * @return the location point p0
      */
-
     public Point getP0() {
         return p0;
     }
+
     /**
-     * vector up
-     * @return vUp
+     * Returns the up direction vector of the Camera.
+     *
+     * @return the up direction vector vUp
      */
     public Vector getvUp() {
         return vUp;
     }
+
     /**
-     * vector To
-     * @return vTo
+     * Returns the forward direction vector of the Camera.
+     *
+     * @return the forward direction vector vTo
      */
     public Vector getvTo() {
         return vTo;
     }
+
     /**
-     * vector right
-     * @return vRight
+     * Returns the right direction vector of the Camera.
+     *
+     * @return the right direction vector vRight
      */
     public Vector getvRight() {
         return vRight;
     }
+
     /**
-     * the width
-     * @return width
+     * Returns the width of the view plane.
+     *
+     * @return the width of the view plane
      */
     public double getWidth() {
         return width;
     }
+
     /**
-     * height
-     * @return height
+     * Returns the height of the view plane.
+     *
+     * @return the height of the view plane
      */
     public double getHeight() {
         return height;
     }
+
     /**
-     * distance
-     * @return distance
+     * Returns the distance to the view plane.
+     *
+     * @return the distance to the view plane
      */
     public double getDistance() {
         return distance;
     }
+
     /**
      * Private default constructor to prevent direct instantiation.
      */
     private Camera() {
         // This constructor is intentionally empty to prevent direct instantiation
     }
+
     /**
      * Returns a new Builder object for constructing a Camera instance.
      *
@@ -80,12 +104,46 @@ public class Camera implements Cloneable {
     public static Builder getBuilder() {
         return new Builder();
     }
-    public Ray constructRay(int Nx, int Ny, int j, int i) {
-        return null;
+
+    public Ray constructRay(int nX, int nY, int j, int i)  {      // Implementation of ray construction (not provided in the initial code)
+        Point Pc = p0.add(vTo.scale(distance));
+
+        // Calculate the pixel dimensions on the view plane
+        double Rx = width / nX;
+        double Ry = height / nY;
+
+        // Set the initial point on the view plane to Pc
+        Point Pij = Pc;
+
+        // Calculate the coordinates of the pixel on the view plane
+        double Xj = (j - (nX - 1) / 2d) * Rx;
+        double Yi = -(i - (nY - 1) / 2d) * Ry;
+
+        // Check if the pixel is at the center of the view plane
+        if (isZero(Xj) && isZero(Yi)) {
+            return new Ray(p0, Pij.subtract(p0));
+        }
+
+        // Check if the pixel is on the horizontal axis of the view plane
+        if (isZero(Xj)) {
+            Pij = Pij.add(vUp.scale(Yi));
+            return new Ray(p0, Pij.subtract(p0));
+        }
+
+        // Check if the pixel is on the vertical axis of the view plane
+        if (isZero(Yi)) {
+            Pij = Pij.add(vRight.scale(Xj));
+            return new Ray(p0, Pij.subtract(p0));
+        }
+
+        // Calculate the final point on the view plane for the specified pixel
+        Pij = Pij.add(vRight.scale(Xj).add(vUp.scale(Yi)));
+
+        // Return the constructed ray from the camera's location to the calculated point on the view plane
+        return new Ray(p0, Pij.subtract(p0));
     }
 
-    public static class Builder
-    {
+    public static class Builder {
         private final Camera camera;
 
         /**
@@ -95,14 +153,6 @@ public class Camera implements Cloneable {
             this.camera = new Camera();
         }
 
-        /**
-         * Constructor that initializes the Builder with an existing Camera object.
-         *
-         * @param camera the Camera object to initialize the Builder with
-         */
-        public Builder(Camera camera) {
-            this.camera = camera;
-        }
         /**
          * Sets the location of the Camera.
          *
@@ -180,42 +230,39 @@ public class Camera implements Cloneable {
          * @return a new Camera object with validated and calculated parameters
          * @throws MissingResourceException if any relevant camera fields are zero or missing
          */
-        public Camera build() throws MissingResourceException {
+        public Camera build() {
             // Constants for exception messages
             final String MISSING_DATA_DESCRIPTION = "rendering data is missing";
             final String CAMERA_CLASS_NAME = "Camera";
 
-            try {
-                // Check if any relevant fields are zero or missing
-                if (camera.p0 == null || camera.vUp == null || camera.vTo == null || camera.width == 0 || camera.height == 0 || camera.distance == 0) {
-                    throw new MissingResourceException("Rendering data is missing", CAMERA_CLASS_NAME, MISSING_DATA_DESCRIPTION);
-                }
-
-                // Check if the vector pointing to the right is missing
-                if (camera.vRight == null) {
-                    // Calculate the cross product of vTo and vUp to get the "right" vector
-                    camera.vRight = camera.vTo.crossProduct(camera.vUp).normalize();
-                }
-
-                // Check if vectors are normalized, normalize them if necessary
-                if (camera.vUp.length() != 1) {
-                    camera.vUp = camera.vUp.normalize();
-                }
-                if (camera.vTo.length() != 1) {
-                    camera.vTo = camera.vTo.normalize();
-                }
-                if (camera.vRight.length() != 1) {
-                    camera.vRight = camera.vRight.normalize();
-                }
-
-                // Return a copy of the camera fields
-                return (Camera) this.clone();
-            } catch (CloneNotSupportedException e) {
-                // Handle the CloneNotSupportedException by throwing a RuntimeException
-                throw new RuntimeException("Cloning not supported", e);
+            // Check if any relevant fields are zero or missing
+            if (camera.p0 == null || camera.vUp == null || camera.vTo == null || camera.width == 0 || camera.height == 0 || camera.distance == 0) {
+                throw new MissingResourceException("Rendering data is missing", CAMERA_CLASS_NAME, MISSING_DATA_DESCRIPTION);
             }
+
+            // Check if vectors are normalized, normalize them if necessary
+            if (camera.vUp.length() != 1) {
+                camera.vUp = camera.vUp.normalize();
+            }
+            if (camera.vTo.length() != 1) {
+                camera.vTo = camera.vTo.normalize();
+            }
+            if (camera.vRight.length() != 1) {
+                camera.vRight = camera.vRight.normalize();
+            }
+
+            // Return a cloned Camera object
+            return camera.clone();
         }
+    }
 
-
+    /**
+     * Utility method to check if a value is approximately zero.
+     *
+     * @param value the value to check
+     * @return true if the value is approximately zero, false otherwise
+     */
+    private static boolean isZero(double value) {
+        return Math.abs(value) < 1e-10;
     }
 }
