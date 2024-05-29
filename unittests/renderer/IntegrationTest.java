@@ -64,7 +64,7 @@ public class IntegrationTest {
         Sphere s2 = new Sphere(new Point(0, 0, -2.5),2.5);
         int sum2 = sumIntersection(camera2, s2, 3, 3);
 
-        assertEquals(9, sum2,
+        assertEquals(18, sum2,
                 "constructRay() and findIntersections() wrong result");
 
 
