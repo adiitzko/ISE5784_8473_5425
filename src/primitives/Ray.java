@@ -1,5 +1,6 @@
 package primitives;
 
+import java.util.List;
 /**
  * This class represents a ray in 3D space. A ray originates from a point (head) and extends infinitely in a specific direction (normalized vector).
  */
@@ -58,5 +59,26 @@ public class Ray {
     @Override
     public String toString() {
         return "Ray [head=" + head + ", direction=" + direction + "]";
+    }
+
+    /**
+     * returns the closest point to the ray's origin point
+     *
+     * @param points points to check
+     * @return closest point
+     */
+    public Point findClosestPoint(List<Point> points) {
+        Point closest = null;
+        double d = Integer.MAX_VALUE;
+        double calcD;
+
+        for (Point point : points) {
+            calcD = point.distanceSquared(head);
+            if (calcD < d) {
+                closest = point;
+                d = calcD;
+            }
+        }
+        return closest;
     }
 }
