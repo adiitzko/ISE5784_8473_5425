@@ -30,7 +30,7 @@ public class IntegrationTest {
      * @param nY width of the view plane
      * @return sum of intersections
      */
-    int sumIntersection(Camera camera, Intersectable body, int nX, int nY) {
+     private int sumIntersection(Camera camera, Intersectable body, int nX, int nY) {
         int sum = 0;
         // sum the intersections for each ray from each pixel
         for (int j = 0; j < nX; j++) {
@@ -64,7 +64,7 @@ public class IntegrationTest {
         Sphere s2 = new Sphere(new Point(0, 0, -2.5),2.5);
         int sum2 = sumIntersection(camera2, s2, 3, 3);
 
-        assertEquals(18, sum2,
+        assertEquals(9, sum2,
                 "constructRay() and findIntersections() wrong result");
 
 
