@@ -3,6 +3,7 @@ package renderer;
 import primitives.Point;
 import primitives.Vector;
 import primitives.Ray;
+import primitives.Util;
 
 import java.util.MissingResourceException;
 
@@ -120,18 +121,18 @@ public class Camera implements Cloneable {
         double Yi = -(i - (nY - 1) / 2d) * Ry;
 
         // Check if the pixel is at the center of the view plane
-        if (isZero(Xj) && isZero(Yi)) {
+        if (Util.isZero(Xj) && Util.isZero(Yi)) {
             return new Ray(p0, Pij.subtract(p0));
         }
 
         // Check if the pixel is on the horizontal axis of the view plane
-        if (isZero(Xj)) {
+        if (Util.isZero(Xj)) {
             Pij = Pij.add(vUp.scale(Yi));
             return new Ray(p0, Pij.subtract(p0));
         }
 
         // Check if the pixel is on the vertical axis of the view plane
-        if (isZero(Yi)) {
+        if (Util.isZero(Yi)) {
             Pij = Pij.add(vRight.scale(Xj));
             return new Ray(p0, Pij.subtract(p0));
         }
@@ -180,7 +181,7 @@ public class Camera implements Cloneable {
             if (vTo == null || vUp == null) {
                 throw new IllegalArgumentException("Direction vectors cannot be null");
             }
-            if (!isZero(vTo.dotProduct(vUp))) {
+            if (!Util.isZero(vTo.dotProduct(vUp))) {
                 throw new IllegalArgumentException("Direction vectors must be perpendicular");
             }
             this.camera.vTo = vTo.normalize();
@@ -256,13 +257,5 @@ public class Camera implements Cloneable {
         }
     }
 
-    /**
-     * Utility method to check if a value is approximately zero.
-     *
-     * @param value the value to check
-     * @return true if the value is approximately zero, false otherwise
-     */
-    private static boolean isZero(double value) {
-        return Math.abs(value) < 1e-10;
-    }
+
 }
