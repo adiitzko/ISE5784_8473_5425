@@ -323,7 +323,7 @@ public class Camera implements Cloneable {
 
      @throws UnsupportedOperationException If the image writer or ray tracer is missing.
      */
-    public void renderImage() {
+    public Camera renderImage() {
         if (this.imageWriter == null)
             throw new UnsupportedOperationException("Missing imageWriter");
         if (this.rayTracer == null)
@@ -335,6 +335,7 @@ public class Camera implements Cloneable {
                 this.imageWriter.writePixel(j, i, color);
             }
         }
+        return this;
     }
 
     /*
