@@ -337,11 +337,14 @@ public class Camera implements Cloneable {
         }
         return this;
     }
-
-    /*
-     * printGrid creates a grid of lines
-     * want to color the pixels where the grid appears in them, leave the other pixels alone
-     * */
+    /**
+     * Creates a grid of lines on the image.
+     * Colors the pixels where the grid lines appear and leaves the other pixels unchanged.
+     *
+     * @param interval the spacing between the grid lines in pixels.
+     * @param color the color of the grid lines.
+     * @return the Camera object for method chaining.
+     */
     public Camera printGrid(int interval, Color color) {
         double nX = imageWriter.getNx();
         double nY = imageWriter.getNy();
@@ -353,13 +356,19 @@ public class Camera implements Cloneable {
             }
         }
         return this;
-
     }
+
+    /**
+     * Writes the image to the output.
+     * Throws an exception if the imageWriter is null.
+     *
+     * @return the Camera object for method chaining.
+     * @throws MissingResourceException if the imageWriter field is null.
+     */
     public Camera writeToImage() {
         if (imageWriter == null) {
             throw new MissingResourceException("ImageWriter field cannot be null", Camera.class.getName(), "");
         }
-        // delegates the appropriate method of the ImageWriter.
         imageWriter.writeToImage();
         return this;
     }
