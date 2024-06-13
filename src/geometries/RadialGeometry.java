@@ -1,13 +1,9 @@
 package geometries;
-
-import primitives.Point;
-import primitives.Vector;
-
 /**
  * An abstract class representing all geometries with a radius.
  * @author Ruth Katanov 326295425  Adi Itzkovich 214608473
  */
-public abstract class RadialGeometry implements Geometry {
+public abstract class RadialGeometry extends Geometry {
 
     /** The radius of the geometry */
     protected final double _radius;

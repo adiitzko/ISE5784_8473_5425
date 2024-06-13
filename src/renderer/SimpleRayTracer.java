@@ -1,12 +1,11 @@
 package renderer;
 
 
-import primitives.Color;
-import primitives.Point;
-import primitives.Ray;
+import primitives.*;
 import scene.Scene;
-
+import geometries.Intersectable.GeoPoint;
 import java.util.List;
+import lighting.*;
 
 /**
  *
@@ -27,20 +26,74 @@ public class SimpleRayTracer extends RayTracerBase {
 
     @Override
     public Color traceRay(Ray ray) {
-        List<Point> intersectionPoints = scene.geometries.findIntersections(ray);
-        if (intersectionPoints == null)
-            return scene.background;
-        return calcColor(ray.findClosestPoint(intersectionPoints));
+        List<GeoPoint> geoPoints = scene.geometries.findGeoIntersections(ray);
+        return (geoPoints == null) ? scene.background : calcColor(ray.findClosestGeoPoint(geoPoints), ray);
     }
 
     /**
-     * Calculates the color at a certain point of intersection.
      *
-     * @param p intersection point
-     * @return color at the point
+     * @param intersection of the geometry
+     * @param ray to calculate the color
+     * @return the color
      */
-    private Color calcColor(Point p) {
-        return scene.ambientLight.getIntensity();
+    private Color calcColor(GeoPoint intersection, Ray ray) {
+        return scene.ambientLight.getIntensity().add(calcLocalEffects(intersection, ray));
     }
 
+    /**
+     * calculate the effects of the geometry itself without the effect of other
+     * geometries on this object
+     *
+     * @param gp  the point to calculate the effects on
+     * @param ray the ray we intersected with
+     * @return the result color of the local effects
+     */
+    private Color calcLocalEffects(GeoPoint gp, Ray ray) {
+        Color color = gp.geometry.getEmission();
+        Vector v = ray.direction;
+        Vector n = gp.geometry.getNormal(gp.point);
+        double nv = Util.alignZero(n.dotProduct(v));
+        if (nv == 0)
+            return color;
+        Material material = gp.geometry.getMaterial();
+        for (LightSource lightSource : scene.lights) {
+            Vector l = lightSource.getL(gp.point);
+            double nl = Util.alignZero(n.dotProduct(l));
+            if (nl * nv > 0) { // sign(nl) == sing(nv)
+                Color iL = lightSource.getIntensity(gp.point);
+                color = color.add(iL.scale(calcDiffusive(material, nl)), iL.scale(calcSpecular(material, n, l, nl, v)));
+            }
+        }
+        return color;
+    }
+
+    /**
+     * calculates the diffusive light part of the object
+     *
+     * @param material the material of the object
+     * @param cosAngle the cosine of the angle between the light and the normal to
+     *                 the object
+     * @return the diffusive light color
+     */
+    private Double3 calcDiffusive(Material material, double cosAngle) {
+        return material.kD.scale(cosAngle > 0 ? cosAngle : -cosAngle);
+    }
+
+    /**
+     * calculates the specular light part of the object
+     *
+     * @param material the material of the object
+     * @param normal   the normal to the object
+     * @param lightDir the direction of the light
+     * @param cosAngle the cosine of the angle between the light and the normal to
+     *                 the object
+     * @param rayDir   the direction the camera is pointed to
+     * @return
+     */
+    private Double3 calcSpecular(Material material, Vector normal, Vector lightDir, double cosAngle, Vector rayDir) {
+        Vector r = lightDir.subtract(normal.scale(2 * cosAngle));
+        double coefficient = -rayDir.dotProduct(r);
+        coefficient = coefficient > 0 ? coefficient : 0;
+        return material.kS.scale(Math.pow(coefficient, material.nShininess));
+    }
 }

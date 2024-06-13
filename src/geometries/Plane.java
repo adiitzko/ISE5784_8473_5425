@@ -8,7 +8,7 @@ import primitives.Util;
  * Represents a plane in three-dimensional space.
  *  *  * @author Ruth Katanov 326295425  Adi Itzkovich 214608473
  */
-public class Plane implements Geometry {
+public class Plane extends Geometry {
 
          private final Point p;
          protected final Vector normal;
@@ -21,7 +21,7 @@ public class Plane implements Geometry {
      */
         public Plane(Point p1, Point p2, Point p3) {
             p = p1;
-            try { // try for case the consructor get all point on the same vector or at least two point are the same
+            try { // try for case the constructor get all point on the same vector or at least two point are the same
                 normal = p1.subtract(p2).crossProduct(p1.subtract(p3)).normalize();
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("your points are on the same vector");
@@ -53,10 +53,11 @@ public class Plane implements Geometry {
      */
     public Vector getNormal() {
             return normal;
-        }
+    }
+
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
 
         // if the ray and plane are parallel (i.e., dot product between their normal vectors is 0),
         // then there is no intersection between them
@@ -70,9 +71,13 @@ public class Plane implements Geometry {
         // t represents the distance between the ray's starting point and the intersection point
         double t = (this.getNormal().dotProduct(p.subtract(ray.head))) / denominator;
         if (t > 0) {
-            return List.of(ray.getPoint(t));
+            return List.of(new GeoPoint(this, ray.getPoint(t)));
         }
         return null;
     }
 
+    public List<GeoPoint> findGeoIntersections(Ray ray) {
+        return findGeoIntersectionsHelper(ray);
     }
+
+}

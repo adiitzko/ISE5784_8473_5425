@@ -4,12 +4,13 @@ package renderer;
 import primitives.Color;
 import primitives.Ray;
 import scene.Scene;
-
+import geometries.Intersectable.GeoPoint;
 
 /**
  * Class implementing a ray tracer for any scene.
  */
 public abstract class RayTracerBase {
+
     protected Scene scene;
 
     /**

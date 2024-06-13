@@ -1,6 +1,8 @@
 package primitives;
 
 import java.util.List;
+import geometries.Intersectable.GeoPoint;
+
 /**
  * This class represents a ray in 3D space. A ray originates from a point (head) and extends infinitely in a specific direction (normalized vector).
  */
@@ -62,23 +64,32 @@ public class Ray {
     }
 
     /**
-     * returns the closest point to the ray's origin point
+     * finds the closest point to the head point of the ray
      *
-     * @param points points to check
-     * @return closest point
+     * @param points list of points to check
+     * @return the closest point
      */
     public Point findClosestPoint(List<Point> points) {
-        Point closest = null;
-        double d = Integer.MAX_VALUE;
-        double calcD;
-
-        for (Point point : points) {
-            calcD = point.distanceSquared(head);
-            if (calcD < d) {
-                closest = point;
-                d = calcD;
+        return points == null || points.isEmpty() ? null
+                : findClosestGeoPoint(points.stream().map(p -> new GeoPoint(null, p)).toList()).point;
+    }
+    /**
+     * finds the closest geoPoint to a given geoPoint
+     * @param geoPoints a list of geoPoints
+     * @return the closest geoPoint
+     */
+    public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPoints) {
+        if (geoPoints == null || geoPoints.size() == 0)
+            return null;
+        GeoPoint closestGeoPoint = geoPoints.get(0);
+        double minDistance = head.distanceSquared(closestGeoPoint.point);
+        for (GeoPoint geoPoint : geoPoints) {
+            double currentDistance = head.distanceSquared(geoPoint.point);
+            if (currentDistance < minDistance) {
+                minDistance = currentDistance;
+                closestGeoPoint = geoPoint;
             }
         }
-        return closest;
+        return closestGeoPoint;
     }
 }

@@ -12,50 +12,47 @@ import primitives.Ray;
  * @author Adi and Ruth
  *
  */
-public class Geometries implements Intersectable {
+public class Geometries extends Intersectable {
 
-    private final List<Intersectable> geometList = new LinkedList<>();
+    final private List<Intersectable> shapes;
 
     /**
-     * The default constructor (the list will be empty)
+     * default constructor
      */
     public Geometries() {
+        shapes = new LinkedList<>();
     }
 
     /**
-     * a constructor that receives a list of geometric objects and adds them to the
-     * list
+     * construct geometries with starting shapes
      *
-     * @param geometries geometries Intersectable
+     * @param geometries list of Intersectables the shape will contain
      */
     public Geometries(Intersectable... geometries) {
-        if (geometries != null)
-            add(geometries);
+        shapes = List.of(geometries);
     }
 
     /**
-     * add object to list
+     * add new Intersectables to the collection
      *
-     * @param geometries objects to add
+     * @param geometries the new Intersectables
      */
     public void add(Intersectable... geometries) {
-        this.geometList.addAll(List.of(geometries));
+        shapes.addAll(List.of(geometries));
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray){
-        if(this.geometList.isEmpty())
-            return null;
-        List<Point> temp = new ArrayList<Point>();
-        for (Intersectable intersectable : geometList)
-        {
-            List<Point> intersection = intersectable.findIntersections(ray);
-            if (intersection != null)
-                temp.addAll(intersection);
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        LinkedList<GeoPoint> intersections = null;
+        for (Intersectable shape : shapes) {
+            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray);
+            if (shapeIntersections != null) {
+                if (intersections == null)
+                    intersections = new LinkedList<>();
+                intersections.addAll(shapeIntersections);
+            }
         }
-
-        if (temp.isEmpty())
-            return null;
-        return temp;
+        return intersections;
     }
+
 }

@@ -36,36 +36,23 @@ public class Sphere extends RadialGeometry {
 
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
-        // if the ray starts at the center of the sphere
-        double tm = 0;
-        double d = 0;
-        if (!_center.equals(ray.head)){ // if the ray doesn't start at the center of the sphere
-            Vector L = _center.subtract(ray.head);
-            tm = L.dotProduct(ray.direction);
-            d =L.lengthSquared() - tm * tm; // d = (|L|^2 - tm^2)
-            if (d < 0)
-                d = -d;
-            d = Math.sqrt(d);
-        }
-        if (d > _radius) // if the ray doesn't intersect the sphere
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        Point p0 = ray.head;
+        if (_center.equals(p0))
+            return List.of(new GeoPoint(this, ray.getPoint(_radius)));
+        Vector u = _center.subtract(p0);
+        double tm = u.dotProduct(ray.direction);
+        double d = Math.sqrt(u.lengthSquared() - tm * tm);
+        double dif = Util.alignZero(d - _radius);
+        if (dif >= 0)
             return null;
-        // computing the distance from the ray's start point to the intersection points
         double th = Math.sqrt(_radius * _radius - d * d);
-        double t1 = tm - th;
-        double t2 = tm + th;
-        if (t1 <= 0 && t2 <= 0)
+        double t2 = Util.alignZero(tm + th);
+        if (t2 <= 0)
             return null;
-        if (Util.alignZero(t2) == 0) // if the ray is tangent to the sphere
-            return null;
-        if (th == 0)
-            return null;
-        if (t1 <= 0){ // if the ray starts inside the sphere or the ray starts after the sphere
-            return List.of(ray.getPoint(t2));
-        }
-        if (t2 <= 0) { //if the ray starts after the sphere
-            return List.of(ray.getPoint(t1));
-        }
-        return List.of(ray.getPoint(t1), ray.getPoint(t2)); // if the ray intersects the sphere twice
+        double t1 = Util.alignZero(tm - th);
+        return t1 > 0 //
+                ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, ray.getPoint(t2))) //
+                : List.of(new GeoPoint(this,ray.getPoint(t2)));
     }
 }

@@ -6,6 +6,7 @@ package primitives;
  */
 public class Vector extends Point{
 
+
     /**
      * Constructor that initializes the vector with the specified x, y, and z components.
      *
