@@ -9,7 +9,7 @@ import primitives.*;
  *
  */
 public class SpotLight extends PointLight {
-    private Vector direction;
+    final private Vector direction;
     private int narrowness = 1;
     /**
      * construct SpotLight using color, position, and direction vector
@@ -22,6 +22,39 @@ public class SpotLight extends PointLight {
         super(intensity, position);
         this.direction = direction.normalize();
     }
+    /**
+     * Sets the constant attenuation factor.
+     * @param kC the constant attenuation factor
+     * @return the current SpotLight instance (for chaining)
+     */
+    @Override
+    public SpotLight setKc(double kC) {
+        super.setKc(kC);
+        return this;
+    }
+
+    /**
+     * Sets the linear attenuation factor.
+     * @param kL the linear attenuation factor
+     * @return the current SpotLight instance (for chaining)
+     */
+    @Override
+    public SpotLight setKl(double kL) {
+        super.setKl(kL);
+        return this;
+    }
+
+    /**
+     * Sets the quadratic attenuation factor.
+     * @param kQ the quadratic attenuation factor
+     * @return the current SpotLight instance (for chaining)
+     */
+    @Override
+    public SpotLight setKq(double kQ) {
+        super.setKq(kQ);
+        return this;
+    }
+
 
     @Override
     public Color getIntensity(Point p) {

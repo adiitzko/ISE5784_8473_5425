@@ -12,7 +12,7 @@ public interface LightSource {
      * @param p given point
      * @return the intensity at the point
      */
-    public Color getIntensity(Point p);
+    Color getIntensity(Point p);
 
     /**
      * calculate the normalized vector from the light source to given point
@@ -20,6 +20,6 @@ public interface LightSource {
      * @param p the point
      * @return the normalized vector
      */
-    public Vector getL(Point p);
+    Vector getL(Point p);
 
 }
