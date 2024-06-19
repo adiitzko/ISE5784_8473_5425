@@ -6,38 +6,27 @@ import primitives.Double3;
 /**
  * Ambient lighting for scene
  */
-public class AmbientLight {
+public class AmbientLight extends Light {
     /** Black background */
     public static final AmbientLight NONE = new AmbientLight(Color.BLACK, Double3.ZERO);
 
-    private final Color intensity;
-
     /**
-     * constructs Ambient light object with a given intensity and attenuation factor
+     * construct ambient light using a color and an attenuation vector
      *
-     * @param iA intensity
-     * @param kA attenuation factor
+     * @param iA the color
+     * @param kA the attenuation vector
      */
     public AmbientLight(Color iA, Double3 kA) {
-        this.intensity = iA.scale(kA);
+        super(iA.scale(kA));
     }
 
     /**
-     * constructs Ambient light object with a given intensity and attenuation factor
+     * construct ambient light using a color and an attenuation scalar
      *
-     * @param iA intensity
-     * @param kA attenuation factor
+     * @param iA the color
+     * @param kA the attenuation scalar
      */
     public AmbientLight(Color iA, double kA) {
-        this.intensity = iA.scale(kA);
-    }
-
-    /**
-     * returns the intensity of the light
-     *
-     * @return the intensity
-     */
-    public Color getIntensity() {
-        return intensity;
+        super(iA.scale(kA));
     }
 }
