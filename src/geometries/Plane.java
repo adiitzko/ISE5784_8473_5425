@@ -57,27 +57,16 @@ public class Plane extends Geometry {
 
 
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-
-        // if the ray and plane are parallel (i.e., dot product between their normal vectors is 0),
-        // then there is no intersection between them
-        double denominator = this.getNormal().dotProduct(ray.direction);
-        if (Util.isZero(denominator)) {
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        Point rayP0 = ray.head;
+        if (rayP0.equals(p))
             return null;
-        }
-        // if the ray's starting point is on the plane, then the ray not intersects the plane at the starting point
-        if (p.equals(ray.head))
+        double denom = normal.dotProduct(ray.direction);
+        if (Util.isZero(denom))
             return null;
-        // t represents the distance between the ray's starting point and the intersection point
-        double t = (this.getNormal().dotProduct(p.subtract(ray.head))) / denominator;
-        if (t > 0) {
-            return List.of(new GeoPoint(this, ray.getPoint(t)));
-        }
-        return null;
+        double t = Util.alignZero(normal.dotProduct(p.subtract(rayP0)) / denom);
+        return t <= 0 || Util.alignZero(t - maxDistance) >= 0 ? null : List.of(new GeoPoint(this, ray.getPoint(t)));
     }
 
-    public List<GeoPoint> findGeoIntersections(Ray ray) {
-        return findGeoIntersectionsHelper(ray);
-    }
 
 }

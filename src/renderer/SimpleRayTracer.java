@@ -14,6 +14,7 @@ import lighting.*;
  */
 
 public class SimpleRayTracer extends RayTracerBase {
+    private static final double DELTA = 0.1;
 
     /**
      * Creates basic ray tracer
@@ -37,7 +38,7 @@ public class SimpleRayTracer extends RayTracerBase {
      * @return the color
      */
     private Color calcColor(GeoPoint intersection, Ray ray) {
-        return scene.ambientLight.getIntensity().add(calcLocalEffects(intersection, ray));
+        return scene.ambientLight.getIntensity().add(intersection.geometry.getEmission()).add(calcLocalEffects(intersection, ray));
     }
 
     /**
@@ -59,13 +60,14 @@ public class SimpleRayTracer extends RayTracerBase {
         for (LightSource lightSource : scene.lights) {
             Vector l = lightSource.getL(gp.point);
             double nl = Util.alignZero(n.dotProduct(l));
-            if (nl * nv > 0) { // sign(nl) == sing(nv)
+            if (nl * nv > 0 && unshaded(gp, l, n, nl,lightSource)){
                 Color iL = lightSource.getIntensity(gp.point);
                 color = color.add(iL.scale(calcDiffusive(material, nl)), iL.scale(calcSpecular(material, n, l, nl, v)));
             }
         }
         return color;
     }
+
 
     /**
      * calculates the diffusive light part of the object
@@ -95,5 +97,19 @@ public class SimpleRayTracer extends RayTracerBase {
         double coefficient = -rayDir.dotProduct(r);
         coefficient = coefficient > 0 ? coefficient : 0;
         return material.kS.scale(Math.pow(coefficient, material.nShininess));
+    }
+
+    /**
+     * checks if a point on a geometry is shaded by a light source
+     *
+     * @param gp       the point on the geometry
+     * @param l        the direction vector of the light source
+     * @param n        the normal to the geometry
+     * @return True if the object is not shaded, False otherwise
+     */
+    private boolean unshaded(GeoPoint gp, Vector l, Vector n, double nl, LightSource light) {
+        Vector lightDir = l.scale(-1);
+        Ray lightRay = new Ray(gp.point.add(n.scale(nl < 0 ? DELTA : -DELTA)), lightDir);
+        return scene.geometries.findGeoIntersections(lightRay, light.getDistance(gp.point)) == null;
     }
 }

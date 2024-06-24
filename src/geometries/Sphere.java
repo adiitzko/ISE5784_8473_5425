@@ -35,24 +35,26 @@ public class Sphere extends RadialGeometry {
     }
 
 
-    @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        Point p0 = ray.head;
-        if (_center.equals(p0))
-            return List.of(new GeoPoint(this, ray.getPoint(_radius)));
-        Vector u = _center.subtract(p0);
-        double tm = u.dotProduct(ray.direction);
-        double d = Math.sqrt(u.lengthSquared() - tm * tm);
-        double dif = Util.alignZero(d - _radius);
-        if (dif >= 0)
-            return null;
-        double th = Math.sqrt(_radius * _radius - d * d);
-        double t2 = Util.alignZero(tm + th);
-        if (t2 <= 0)
-            return null;
-        double t1 = Util.alignZero(tm - th);
-        return t1 > 0 //
-                ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, ray.getPoint(t2))) //
-                : List.of(new GeoPoint(this,ray.getPoint(t2)));
-    }
+@Override
+public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+    Point p0 = ray.head;
+    if (_center.equals(p0))
+        return List.of(new GeoPoint(this, ray.getPoint(_radius)));
+    Vector u = _center.subtract(p0);
+    double tm = u.dotProduct(ray.direction);
+    double d = Math.sqrt(u.lengthSquared() - tm * tm);
+    double dif = Util.alignZero(d - _radius);
+    if (dif >= 0)
+        return null;
+    double th = Math.sqrt(_radius * _radius - d * d);
+    double t2 = Util.alignZero(tm + th);
+    double t1 = Util.alignZero(tm - th);
+    if (t2 <= 0 || Util.alignZero(t1 - maxDistance) >= 0)
+        return null;
+    if (Util.alignZero(t2 - maxDistance) >= 0)
+        return t1 > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
+    return t1 > 0 //
+            ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, ray.getPoint(t2))) //
+            : List.of(new GeoPoint(this, ray.getPoint(t2)));
+}
 }

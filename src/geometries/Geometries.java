@@ -41,11 +41,25 @@ public class Geometries extends Intersectable {
         shapes.addAll(List.of(geometries));
     }
 
+
+//    @Override
+//    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+//        LinkedList<GeoPoint> intersections = null;
+//        for (Intersectable shape : shapes) {
+//            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray);
+//            if (shapeIntersections != null) {
+//                if (intersections == null)
+//                    intersections = new LinkedList<>();
+//                intersections.addAll(shapeIntersections);
+//            }
+//        }
+//        return intersections;
+//    }
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         LinkedList<GeoPoint> intersections = null;
         for (Intersectable shape : shapes) {
-            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray);
+            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray, maxDistance);
             if (shapeIntersections != null) {
                 if (intersections == null)
                     intersections = new LinkedList<>();

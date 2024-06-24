@@ -103,4 +103,5 @@ class SphereTests {
         // sphere center line
         assertNull(sphere.findIntersections(new Ray(new Point(-0.5, 0, 0), new Vector(0, 1, 0))), "ERROR TC22");
     }
+
 }

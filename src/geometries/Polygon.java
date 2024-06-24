@@ -88,9 +88,10 @@ public class Polygon extends Geometry {
         return plane.getNormal();
     }
 
+
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        List<GeoPoint> intersections = plane.findGeoIntersectionsHelper(ray);
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        List<GeoPoint> intersections = plane.findGeoIntersectionsHelper(ray, maxDistance);
         if (intersections == null)
             return null;
         intersections = List.of(new GeoPoint(this,intersections.get(0).point));
