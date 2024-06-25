@@ -18,6 +18,7 @@ public class Ray {
      */
     public Vector direction;
 
+    private static final double DELTA = 0.1;
     /**
      * Constructor that initializes the ray with a starting point (head) and a direction vector.
      *
@@ -27,6 +28,18 @@ public class Ray {
     public Ray(Point head, Vector direction) {
         this.head = head;
         this.direction = direction.normalize();
+    }
+    /**
+     * Constructs a new Ray object.
+     *
+     * @param p0      The starting point of the ray.
+     * @param dir      The direction vector of the ray.
+     * @param normal The normal vector.
+     */
+    public Ray(Point p0, Vector dir, Vector normal) {
+        double nv = normal.dotProduct(dir);
+        this.head = p0.add(normal.scale(nv > 0 ? DELTA : -DELTA));
+        this.direction = dir.normalize();
     }
 
     /**

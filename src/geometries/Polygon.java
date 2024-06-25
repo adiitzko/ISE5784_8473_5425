@@ -89,25 +89,47 @@ public class Polygon extends Geometry {
     }
 
 
+    /**Finds the intersection-geoPoints between a ray and the poligon represented by this object.
+     @param ray The ray to intersect with the poligon.
+     @return A list of GeoPoints representing the intersection-geoPoints between the ray and the poligon**/
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        List<GeoPoint> intersections = plane.findGeoIntersectionsHelper(ray, maxDistance);
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        List<GeoPoint> intersections = plane.findGeoIntersectionsHelper(ray);
         if (intersections == null)
             return null;
-        intersections = List.of(new GeoPoint(this,intersections.get(0).point));
-        Point rayP0 = ray.head;
-        Vector rayVec = ray.direction;
-        int n = vertices.size();
-        Vector[] edgeVectors = new Vector[n];
-        for (int i = 0; i < n; ++i)
-            edgeVectors[i] = vertices.get(i).subtract(rayP0);
-        double[] scalars = new double[n];
-        for (int i = 0; i < n - 1; ++i)
-            scalars[i] = rayVec.dotProduct(edgeVectors[i].crossProduct(edgeVectors[i + 1]));
-        scalars[n - 1] = rayVec.dotProduct(edgeVectors[n - 1].crossProduct(edgeVectors[0]));
-        for (int i = 0; i < n - 1; ++i)
-            if (Util.alignZero(scalars[i] * scalars[i + 1]) <= 0)
+        // check if the point in out or on the triangle:
+        Vector v1 = vertices.get(0).subtract(ray.head);
+        Vector v2 = vertices.get(1).subtract(ray.head);
+
+        Vector normal = v1.crossProduct(v2).normalize();
+
+        double sign = normal.dotProduct(ray.direction);
+        boolean sameSign = sign > 0;
+        if (isZero(sign))
+            return null;
+        for (int i = 2; i < vertices.size(); i++) {
+            v1 = v2;
+            v2 = vertices.get(i).subtract(ray.head);
+            normal = v1.crossProduct(v2).normalize();
+            sign = normal.dotProduct(ray.direction);
+            if (isZero(sign))
                 return null;
+            if (sameSign != (sign > 0))
+                return null;
+            sameSign = sign > 0;
+        }
+        v1 = v2;
+        v2 = vertices.get(0).subtract(ray.head);
+        normal = v1.crossProduct(v2).normalize();
+        sign = normal.dotProduct(ray.direction);
+        if (isZero(sign))
+            return null;
+        if (sameSign != (sign > 0))
+            return null;
+        sameSign = sign > 0;
+
+        intersections.get(0).geometry = this;
+
         return intersections;
     }
 }

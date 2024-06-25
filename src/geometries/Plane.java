@@ -56,16 +56,34 @@ public class Plane extends Geometry {
     }
 
 
+    /**Finds the intersection-geoPoints between a ray and the plane represented by this object.
+     @param myRay The ray to intersect with the plane.
+     @return A list of GeoPoints representing the intersection-geoPoints between the ray and the plane**/
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-        Point rayP0 = ray.head;
-        if (rayP0.equals(p))
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray myRay) {
+        double nv = normal.dotProduct(myRay.direction);
+        //The plane is parallel to the ray
+        if (Util.isZero(nv))
+        {
             return null;
-        double denom = normal.dotProduct(ray.direction);
-        if (Util.isZero(denom))
+        }
+
+        try
+        {
+            Vector qSubtractP0 = p.subtract(myRay.head);
+            double t = Util.alignZero((normal.dotProduct(qSubtractP0))/nv);
+
+            if(t <= 0)//no intersections-the ray goes to the opposite side
+            {
+                return null;
+            }
+
+            return List.of(new GeoPoint(this,myRay.getPoint(t)));
+        }
+        catch(Exception ex)
+        {
             return null;
-        double t = Util.alignZero(normal.dotProduct(p.subtract(rayP0)) / denom);
-        return t <= 0 || Util.alignZero(t - maxDistance) >= 0 ? null : List.of(new GeoPoint(this, ray.getPoint(t)));
+        }
     }
 
 

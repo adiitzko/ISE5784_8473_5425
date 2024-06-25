@@ -35,26 +35,41 @@ public class Sphere extends RadialGeometry {
     }
 
 
-@Override
-public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
-    Point p0 = ray.head;
-    if (_center.equals(p0))
-        return List.of(new GeoPoint(this, ray.getPoint(_radius)));
-    Vector u = _center.subtract(p0);
-    double tm = u.dotProduct(ray.direction);
-    double d = Math.sqrt(u.lengthSquared() - tm * tm);
-    double dif = Util.alignZero(d - _radius);
-    if (dif >= 0)
-        return null;
-    double th = Math.sqrt(_radius * _radius - d * d);
-    double t2 = Util.alignZero(tm + th);
-    double t1 = Util.alignZero(tm - th);
-    if (t2 <= 0 || Util.alignZero(t1 - maxDistance) >= 0)
-        return null;
-    if (Util.alignZero(t2 - maxDistance) >= 0)
-        return t1 > 0 ? List.of(new GeoPoint(this, ray.getPoint(t1))) : null;
-    return t1 > 0 //
-            ? List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, ray.getPoint(t2))) //
-            : List.of(new GeoPoint(this, ray.getPoint(t2)));
-}
+    /**Finds the intersection-geoPoints between a ray and the sphere represented by this object.
+     @param ray The ray to intersect with the sphere.
+     @return A list of GeoPoints representing the intersection-geoPoints between the ray and the plsphereane**/
+    @Override
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray){
+        if (ray.head.equals(_center)) // if the begin of the ray in the center, the point, is on the radius
+            return List.of(new GeoPoint(this,ray.getPoint(_radius)));
+        Vector u = _center.subtract(ray.head);
+        double tm = Util.alignZero(ray.direction.dotProduct(u));
+        double d = Util.alignZero(Math.sqrt(u.lengthSquared()- tm * tm));
+        double th = Util.alignZero(Math.sqrt(_radius*_radius - d*d));
+        double t1 = Util.alignZero(tm+th);
+        double t2 = Util.alignZero(tm-th);
+
+
+        if (d > _radius)//the ray is out of the sphere
+            return null; // there are no instructions
+
+
+        if (t1 <=0 && t2<=0)//the ray begins after the sphere and goes to the opposite side
+            return null;
+
+
+        if (t1 > 0 && t2 >0)//2 intersections
+        {
+            //if(Util.alignZero(t1-maxDis)<=0&&Util.alignZero(t2-maxDis)<=0)
+            return List.of(new GeoPoint(this,ray.getPoint(t1)),new GeoPoint(this,ray.getPoint(t2)));
+        }
+
+        if (t1 > 0)//p0 is in the sphere
+        {
+            return List.of(new GeoPoint(this,ray.getPoint(t1)));
+        }
+
+        else//p0 is in the sphere
+            return List.of(new GeoPoint(this,ray.getPoint(t2)));
+    }
 }

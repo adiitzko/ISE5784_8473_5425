@@ -2,10 +2,34 @@ package primitives;
 
 public class Material {
 
+    /**
+     * Diffuse reflection coefficient (kD) for the material.
+     * This determines how much light is diffusely reflected from the surface.
+     */
     public Double3 kD = Double3.ZERO;
+
+    /**
+     * Specular reflection coefficient (kS) for the material.
+     * This determines how much light is reflected in a mirror-like fashion from the surface.
+     */
     public Double3 kS = Double3.ZERO;
+
+    /**
+     * Transparency coefficient (kT) for the material.
+     * This determines how transparent the material is (0 means completely opaque).
+     */
     public Double3 kT = Double3.ZERO;
+
+    /**
+     * Reflection coefficient (kR) for the material.
+     * This determines how reflective the material is (0 means no reflection).
+     */
     public Double3 kR = Double3.ZERO;
+
+    /**
+     * Shininess factor for the material.
+     * This determines the sharpness of the specular reflection (higher values mean sharper reflections).
+     */
     public int Shininess = 0;
 
     /**
@@ -73,6 +97,32 @@ public class Material {
         this.kR = kR;
         return this;
     }
+    /**
+     * Sets the specular reflection coefficient of the material.
+     *
+     * @param kT transparency reflectivity
+     *           channels.
+     * @return The updated Material object.
+     */
+    public Material setKt(double kT) {
+        this.kT = new Double3(kT);
+        return this;
+    }
+
+    /**
+     * Sets the specular reflection coefficient of the material.
+     *
+     * @param kR reflection reflectivity
+     *           channels.
+     * @return The updated Material object.
+     */
+    public Material setKr(double kR) {
+        this.kR = new Double3(kR);
+        return this;
+    }
+
+
+
     /**
      * This function sets the shininess of the material.
      *

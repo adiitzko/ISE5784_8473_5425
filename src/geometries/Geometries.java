@@ -42,24 +42,11 @@ public class Geometries extends Intersectable {
     }
 
 
-//    @Override
-//    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-//        LinkedList<GeoPoint> intersections = null;
-//        for (Intersectable shape : shapes) {
-//            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray);
-//            if (shapeIntersections != null) {
-//                if (intersections == null)
-//                    intersections = new LinkedList<>();
-//                intersections.addAll(shapeIntersections);
-//            }
-//        }
-//        return intersections;
-//    }
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         LinkedList<GeoPoint> intersections = null;
         for (Intersectable shape : shapes) {
-            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray, maxDistance);
+            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray);
             if (shapeIntersections != null) {
                 if (intersections == null)
                     intersections = new LinkedList<>();
@@ -68,5 +55,18 @@ public class Geometries extends Intersectable {
         }
         return intersections;
     }
+//    @Override
+//    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+//        LinkedList<GeoPoint> intersections = null;
+//        for (Intersectable shape : shapes) {
+//            List<GeoPoint> shapeIntersections = shape.findGeoIntersectionsHelper(ray, maxDistance);
+//            if (shapeIntersections != null) {
+//                if (intersections == null)
+//                    intersections = new LinkedList<>();
+//                intersections.addAll(shapeIntersections);
+//            }
+//        }
+//        return intersections;
+//    }
 
 }
