@@ -32,5 +32,15 @@ public class DirectionalLight extends Light implements LightSource {
     public Vector getL(Point p) {
         return direction;
     }
-
+    /**
+     * get distance of light from given point
+     * @param point
+     * @return
+     */
+    @Override
+    public double getDistance(Point point) {
+        //directional light comes from everywhere (sort of) so we want to return a point that definitely is
+        // farther away than any point the function may receive.
+        return Double.POSITIVE_INFINITY;
+    }
 }

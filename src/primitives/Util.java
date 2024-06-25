@@ -31,6 +31,13 @@ public final class Util {
         return getExp(number) < ACCURACY;
     }
 
+    public static boolean isZero(Double3 number) {
+        // Assuming Double3 has x, y, z fields or similar structure
+        return Math.abs(number.d1) < ACCURACY &&
+                Math.abs(number.d2) < ACCURACY &&
+                Math.abs(number.d3) < ACCURACY;
+    }
+
     /** Aligns the number to zero if it is almost zero
      * @param  number the number to align
      * @return        0.0 if the number is very close to zero, the number itself
