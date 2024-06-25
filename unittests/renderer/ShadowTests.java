@@ -17,7 +17,7 @@ public class ShadowTests {
    private final Scene          scene      = new Scene("Test scene");
    /** Camera builder of the tests */
    private final Camera.Builder camera     = Camera.getBuilder()
-      .setDirection(new Vector(0,0,-1), new Vector(0,1,0))
+      .setDirection( new Vector(0, 0, -1), new Vector(0, 1, 0))
       .setLocation(new Point(0, 0, 1000)).setVpDistance(1000)
       .setVpSize(200, 200)
       .setRayTracer(new SimpleRayTracer(scene));
@@ -56,7 +56,7 @@ public class ShadowTests {
    @Test
    public void sphereTriangleMove1() {
       sphereTriangleHelper("shadowSphereTriangleMove2", //
-                           new Triangle(new Point(-62, -32, 0), new Point(-32, -62, 0), new Point(-60, -60, -4)),
+                           new Triangle(new Point(-62, -32, 0), new Point(-32, -62, 0), new Point(-60, -60, -4)), //
                            new Point(-100, -100, 200));
    }
 
@@ -80,8 +80,8 @@ public class ShadowTests {
    @Test
    public void sphereTriangleSpot2() {
       sphereTriangleHelper("shadowSphereTriangleSpot2", //
-              new Triangle(new Point(-70, -40, 0), new Point(-40, -70, 0), new Point(-68, -68, -4)), //
-              new Point(-76, -76, 70));
+                           new Triangle(new Point(-70, -40, 0), new Point(-40, -70, 0), new Point(-68, -68, -4)), //
+                           new Point(-76, -76, 70));
    }
 
    /** Produce a picture of a two triangles lighted by a spot light with a Sphere

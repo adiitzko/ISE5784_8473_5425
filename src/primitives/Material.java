@@ -1,31 +1,18 @@
 package primitives;
 
-/**
- * represents a material with attenuation coefficients for light in Phong model
- */
 public class Material {
-    /**
-     * the coefficient for diffusive part
-     */
+
     public Double3 kD = Double3.ZERO;
-    /**
-     * the coefficient for specular part
-     *
-     * @return this object
-     */
     public Double3 kS = Double3.ZERO;
-    /**
-     * the shininess power in Phong model
-     *
-     * @return this object
-     */
-    public int nShininess = 0;
+    public Double3 kT = Double3.ZERO;
+    public Double3 kR = Double3.ZERO;
+    public int Shininess = 0;
 
     /**
-     * setter for kD using Double3
+     * Set the diffuse color of the material to the given color and return the material.
      *
-     * @param kD the attenuation in Double3 format
-     * @return this object
+     * @param kD The diffuse color of the material.
+     * @return The material itself.
      */
     public Material setKd(Double3 kD) {
         this.kD = kD;
@@ -33,10 +20,10 @@ public class Material {
     }
 
     /**
-     * setter for kD using scalar
+     * Set the diffuse coefficient to the given value.
      *
-     * @param kD he scalar attenuation coefficient
-     * @return this object
+     * @param kD Diffuse reflectivity.
+     * @return The material itself.
      */
     public Material setKd(double kD) {
         this.kD = new Double3(kD);
@@ -44,10 +31,10 @@ public class Material {
     }
 
     /**
-     * setter for kS using Double3
+     * Set the specular reflectance of this material to the given value.
      *
-     * @param kS the kS to set
-     * @return this object
+     * @param kS specular reflectivity
+     * @return The material itself.
      */
     public Material setKs(Double3 kS) {
         this.kS = kS;
@@ -55,22 +42,45 @@ public class Material {
     }
 
     /**
-     * setter for kS using scalar
+     * Set the specular reflectance of the material to the given value.
      *
-     * @param kS the scalar attenuation coefficient
-     * @return this object
+     * @param kS specular reflectivity
+     * @return The material itself.
      */
     public Material setKs(double kS) {
         this.kS = new Double3(kS);
         return this;
     }
-
     /**
-     * @param nShininess the nShininess to set
-     * @return this object
+     * Set the transparency of the material to the given value.
+     coefficient is the transmitted fraction where 𝒌𝑻 = 𝟏 when
+     object is translucent, 𝒌𝑻 = 𝟎 when the object is opaque.
+     *
+     * @param kT transparency reflectivity
+     * @return The material itself.
      */
-    public Material setShininess(int nShininess) {
-        this.nShininess = nShininess;
+    public Material setkT(Double3 kT) {
+        this.kT = kT;
+        return this;
+    }
+    /**
+     * Set the reflection reflectance of the material to the given value.
+     Perfect mirror has a 𝒌𝑹 = 𝟏 and matt surface has a 𝒌𝑹 = 0
+     * @param kR reflection reflectivity
+     * @return The material itself.
+     */
+    public Material setkR(Double3 kR) {
+        this.kR = kR;
+        return this;
+    }
+    /**
+     * This function sets the shininess of the material.
+     *
+     * @param shininess The shininess of the material.
+     * @return The material object itself.
+     */
+    public Material setShininess(int shininess) {
+        this.Shininess = shininess;
         return this;
     }
 }
