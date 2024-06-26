@@ -8,6 +8,7 @@ import geometries.*;
 import lighting.AmbientLight;
 import primitives.*;
 import scene.Scene;
+import lighting.SpotLight;
 
 /** Test rendering a basic image
  * @author Dan */
@@ -87,5 +88,8 @@ public class RenderTests {
                 .printGrid(100, new Color(YELLOW))
                 .writeToImage();
     }
-}
+
+
+    }
+
 

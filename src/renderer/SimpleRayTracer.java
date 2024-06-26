@@ -5,6 +5,7 @@ import scene.Scene;
 import geometries.Intersectable.GeoPoint;
 import java.util.List;
 import lighting.*;
+import primitives.Ray;
 
 /**
  * SimpleRayTracer class for basic ray tracing operations.
@@ -189,6 +190,33 @@ public class SimpleRayTracer extends RayTracerBase {
         if (intersections == null) return null;
         return ray.findClosestGeoPoint(intersections);
     }
+//    /**
+//     * Checks if a given point is unshaded by finding intersections between the point and the light source.
+//     *
+//     * @param gp   The geometric point to check for shading.
+//     * @param l    The direction from the point towards the light source.
+//     * @param n    The normal vector at the point.
+//     * @param light The light source.
+//     * @param nv   The dot product between the normal vector and the light direction.
+//     * @return {@code true} if the point is unshaded, {@code false} otherwise.
+//     */
+//    private boolean unshaded(GeoPoint gp, Vector l, Vector n, double nv, LightSource light) {
+//        Vector lightDirection = l.scale(-1); // from point to light source
+//        Vector epsVector = n.scale(nv < 0 ? DELTA : -DELTA);
+//        Point point = gp.point.add(epsVector);
+//        Ray lightRay = new Ray(point, lightDirection);
+//        List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay);
+//        if (intersections == null)
+//            return true;
+//        double lightDistance = light.getDistance(gp.point);
+//        for (GeoPoint gp1 : intersections) {
+//            if (Util.alignZero(gp1.point.distance(gp.point) - lightDistance) <= 0)
+//                //&& gp1.geometry.getMaterial().kT == 0)
+//                return false;
+//        }
+//        return true;
+//    }
+
 
     /**
      * Calculates the transparency coefficient of a point for a specific light source.
