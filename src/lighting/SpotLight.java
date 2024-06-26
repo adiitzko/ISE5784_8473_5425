@@ -56,10 +56,24 @@ public class SpotLight extends PointLight {
     }
 
 
+    /**
+     * Calculates the intensity of the light at a given point, taking into account
+     * the spotlight's direction.
+     *
+     * @param p The point in the scene.
+     * @return The intensity of the light at the specified point.
+     */
     @Override
     public Color getIntensity(Point p) {
-        double dotProduct = Util.alignZero(direction.dotProduct(getL(p)));
-        return super.getIntensity().scale(dotProduct > 0 ? Math.pow(dotProduct, narrowness) : 0);
+        Vector l = super.getL(p);
+        if (l == null)
+            return super.getIntensity();
+
+        double directionDotL = Util.alignZero(direction.dotProduct(l));
+        if (directionDotL <= 0)
+            return Color.BLACK;
+
+        return super.getIntensity(p).scale(directionDotL); // the denominator from the super!!
     }
 
     @Override

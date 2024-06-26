@@ -35,41 +35,52 @@ public class Sphere extends RadialGeometry {
     }
 
 
-    /**Finds the intersection-geoPoints between a ray and the sphere represented by this object.
-     @param ray The ray to intersect with the sphere.
-     @return A list of GeoPoints representing the intersection-geoPoints between the ray and the plsphereane**/
-    @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray){
-        if (ray.head.equals(_center)) // if the begin of the ray in the center, the point, is on the radius
-            return List.of(new GeoPoint(this,ray.getPoint(_radius)));
-        Vector u = _center.subtract(ray.head);
-        double tm = Util.alignZero(ray.direction.dotProduct(u));
-        double d = Util.alignZero(Math.sqrt(u.lengthSquared()- tm * tm));
-        double th = Util.alignZero(Math.sqrt(_radius*_radius - d*d));
-        double t1 = Util.alignZero(tm+th);
-        double t2 = Util.alignZero(tm-th);
+//@Override
+    /**
+     * Finds the intersection point(s) of a given Ray with the Sphere.
+     * @param ray the Ray to intersect with the Sphere
+     * @return a List of Point objects representing the intersection point(s) of the Ray and the Sphere.
+     * If no intersection occurs, returns null.
+     */
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        Point p0 = ray.head; // ray's starting point
+        Point O = this._center; //the sphere's center point
+        Vector V = ray.direction; // "the v vector" from the presentation
 
+        // if p0 on center, calculate with line parametric representation
+        // the direction vector normalized.
+        if (O.equals(p0)) {
+            Point newPoint = p0.add(ray.direction.scale(this._radius));
+            return List.of(new GeoPoint(this,newPoint));
+        }
 
-        if (d > _radius)//the ray is out of the sphere
-            return null; // there are no instructions
-
-
-        if (t1 <=0 && t2<=0)//the ray begins after the sphere and goes to the opposite side
+        Vector U = O.subtract(p0);
+        double tm = V.dotProduct(U);
+        double d = Math.sqrt(U.lengthSquared() - tm * tm);
+        if (d >= this._radius) {
             return null;
-
-
-        if (t1 > 0 && t2 >0)//2 intersections
-        {
-            //if(Util.alignZero(t1-maxDis)<=0&&Util.alignZero(t2-maxDis)<=0)
-            return List.of(new GeoPoint(this,ray.getPoint(t1)),new GeoPoint(this,ray.getPoint(t2)));
         }
 
-        if (t1 > 0)//p0 is in the sphere
-        {
-            return List.of(new GeoPoint(this,ray.getPoint(t1)));
+        double th = Math.sqrt(this._radius * this._radius - d * d);
+        double t1 = tm - th;
+        double t2 = tm + th;
+
+        if (t1 > 0 && t2 > 0) {
+            Point p1 = ray.getPoint(t1);
+            Point p2 = ray.getPoint(t2);
+            return List.of(new GeoPoint(this,p1),new GeoPoint(this,p2));
         }
 
-        else//p0 is in the sphere
-            return List.of(new GeoPoint(this,ray.getPoint(t2)));
+        if (t1 > 0) {
+            Point p1 = ray.getPoint(t1);
+            return List.of(new GeoPoint(this,p1));
+        }
+
+        if (t2 > 0) {
+            Point p2 = ray.getPoint(t2);
+            return List.of(new GeoPoint(this,p2));
+        }
+        return null;
+
     }
 }

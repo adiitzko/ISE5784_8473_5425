@@ -27,36 +27,39 @@ public class Triangle extends Polygon {
         super(p1, p2, p3);
     }
 
-    /**Finds the intersection-geoPoints between a ray and the triangle represented by this object.
-     @param ray The ray to intersect with the triangle.
-     @return A list of GeoPoints representing the intersection-geoPoints between the ray and the triangle**/
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        List<GeoPoint> rayPoints = plane.findGeoIntersectionsHelper(ray);
-        if (rayPoints == null)
-            return null;
-        //check if the point in out or on the triangle:
-        Vector v1 = vertices.get(0).subtract(ray.head);
-        Vector v2 = vertices.get(1).subtract(ray.head);
-        Vector v3 = vertices.get(2).subtract(ray.head);
+    /**
+     * Finding intersection-geoPoints with a given ray
+     * @param ray A ray
+     * @return All the intersection-geoPoints of this triangle and the given ray
+     */
+    //Check if the ray intersect the plane.
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray){
+        List<GeoPoint> intersections = plane.findGeoIntersections(ray);
+        if (intersections == null) return null;
 
-        Vector n1 = v1.crossProduct(v2).normalize();
-        Vector n2 = v2.crossProduct(v3).normalize();
-        Vector n3 = v3.crossProduct(v1).normalize();
+        Point p0 = ray.head;
+        Vector v = ray.direction;
 
-        rayPoints.get(0).geometry=this;
-        //The point is inside if all  have the same sign (+/-)
+        Vector v1 = vertices.get(0).subtract(p0);
+        Vector v2 = vertices.get(1).subtract(p0);
+        Vector v3 = vertices.get(2).subtract(p0);
 
-        if (Util.alignZero(n1.dotProduct(ray.direction)) > 0 && Util.alignZero(n2.dotProduct(ray.direction)) > 0 && Util.alignZero(n3.dotProduct(ray.direction)) > 0)
-        {
-            return rayPoints;
-        }
-        else if (Util.alignZero(n1.dotProduct(ray.direction)) < 0 && Util.alignZero(n2.dotProduct(ray.direction)) < 0 && Util.alignZero(n3.dotProduct(ray.direction)) < 0)
-        {
-            return rayPoints;
-        }
-        if (Util.isZero(n1.dotProduct(ray.direction)) || Util.isZero(n2.dotProduct(ray.direction)) || Util.isZero(n3.dotProduct(ray.direction)))
-            return null; //there is no instruction point
-        return null;//opposite signs
+        //Check every side of the triangle
+        double s1 = v.dotProduct(v1.crossProduct(v2));
+
+        if (Util.isZero(s1)) return null;
+
+        double s2 = v.dotProduct(v2.crossProduct(v3));
+
+        if (Util.isZero(s2)) return null;
+
+        double s3 = v.dotProduct(v3.crossProduct(v1));
+
+        if (Util.isZero(s3)) return null;
+
+        if (!((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0))) return null;
+
+        return List.of(new GeoPoint(this,intersections.get(0).point));
     }
 }
