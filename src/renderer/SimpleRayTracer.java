@@ -197,13 +197,11 @@ public class SimpleRayTracer extends RayTracerBase {
 //     * @param l    The direction from the point towards the light source.
 //     * @param n    The normal vector at the point.
 //     * @param light The light source.
-//     * @param nv   The dot product between the normal vector and the light direction.
 //     * @return {@code true} if the point is unshaded, {@code false} otherwise.
 //     */
-//    private boolean unshaded(GeoPoint gp, Vector l, Vector n, double nv, LightSource light) {
+//    private boolean unshaded(GeoPoint gp, Vector l, Vector n, LightSource light) {
 //        Vector lightDirection = l.scale(-1); // from point to light source
-//        Vector epsVector = n.scale(nv < 0 ? DELTA : -DELTA);
-//        Point point = gp.point.add(epsVector);
+//        Point point = gp.point.add(n.scale(Util.alignZero(n.dotProduct(lightDirection)) < 0 ? DELTA : -DELTA));
 //        Ray lightRay = new Ray(point, lightDirection);
 //        List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay);
 //        if (intersections == null)
