@@ -223,5 +223,89 @@ public class ReflectionRefractionTests {
               .writeToImage();
    }
 
+   /////////////////////////////////////////////////////////////////////////////////////
+   @Test
+   public void complexSceneTest2() {
+      ImageWriter imageWriter = new ImageWriter("ComplexScene2", 3000, 3000);
+
+      // Define materials
+      Material shiny = new Material().setKd(0.5).setKs(0.5).setShininess(30);
+      Material reflective = new Material().setKd(0.4).setKs(0.3).setShininess(100).setKr(0.5);
+      Material transparent = new Material().setKd(0.2).setKs(0.2).setShininess(30).setKt(0.6);
+      Material matte = new Material().setKd(0.8).setKs(0.2).setShininess(10);
+
+      // Add geometries to the scene
+      scene.geometries.add(
+              new Triangle(new Point(-150, -150, -115), new Point(150, -150, -135), new Point(75, 75, -150))
+                      .setMaterial(new Material().setKs(0.8).setShininess(60)),
+              new Triangle(new Point(-170, -150, -115), new Point(-200, 70, -140), new Point(65, 75, -150))
+                      .setMaterial(new Material().setKs(0.8).setShininess(60)),
+              new Sphere(new Point(0, 0, -11), 30d)
+                      .setEmission(new Color(BLUE))
+                      .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30)),
+              new Sphere(new Point(-60, -60, -11), 30d)
+                      .setEmission(new Color(orange))
+                      .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30)),
+              new Plane(new Point(0, 0, -200), new Vector(0, 0, 1))
+                      .setMaterial(new Material().setKd(0.8).setKs(0.2).setShininess(10))
+                      .setEmission(new Color(gray)),
+
+//              new Polygon(new Point(-70, -70, -100), new Point(70, -70, -100), new Point(70, 70, -100), new Point(-70, 70, -100))
+//                      .setMaterial(new Material().setKd(0.2).setKs(0.8).setShininess(45))
+//                      .setEmission(new Color(180, 50, 180))
+//              new Tube(new Ray(new Point(0, 100, 100), new Vector(1, 1, 0)), 20)
+//                      .setMaterial(new Material().setKd(0.1).setKs(0.9).setShininess(50))
+//                      .setEmission(new Color(YELLOW))
+              new Sphere(new Point(20, -90, -100), 30d)
+                      .setEmission(new Color(darkGray))
+                      .setMaterial(new Material().setKd(0.3).setKs(0.7).setShininess(60)),
+              new Sphere(new Point(-140, 10, -100), 30d)
+                      .setEmission(new Color(red))
+                      .setMaterial(new Material().setKd(0.3).setKs(0.7).setShininess(90)),
+//              // Adding 2 more shapes for variety
+//              new Triangle(new Point(-50, 110, -100), new Point(110, 110, -100), new Point(30, -50, -100))
+//                      .setMaterial(new Material().setKd(0.5).setKs(0.5).setShininess(30))
+//                      .setEmission(new Color(200, 200, 0)),
+              new Polygon(new Point(-200, 90, -90),  // הגדלתי את ה-y ב-40 והרחבתי את ה-x ב-80 לצד שמאל
+                      new Point(100, 90, -90),   // הגדלתי את ה-y ב-40 והרחבתי את ה-x ב-110 לצד שמאל
+                      new Point(100, 210, -90),  // הגדלתי את ה-y ב-40 והרחבתי את ה-x ב-110 לצד שמאל
+                      new Point(-200, 210, -90)   )
+                      .setMaterial(new Material().setKd(0.6).setKs(0.4).setShininess(25))
+                      .setEmission(new Color(50, 180, 50)),
+              new Polygon( new Point(-170, 120, -120),  // הזזתי את ה-x ב-50 שמאלה
+                      new Point(-170, 120, -20),   // הזזתי את ה-x ב-50 שמאלה
+                      new Point(-170, 180, -20),   // הזזתי את ה-x ב-50 שמאלה
+                      new Point(-170, 180, -120))
+                      .setMaterial(new Material().setKd(0.6).setKs(0.4).setShininess(25))
+                      .setEmission(new Color(BLUE)),
+              new Polygon(
+                      new Point(170, -50, -50),    // נקודה ימנית למעלה של המצולע המעודכן
+                      new Point(170, 10, -50),     // נקודה מעל הנקודה הימנית
+                      new Point(170, 10, -140),    // נקודה מעל לנקודה השמאלית
+                      new Point(170, -50, -140))  // נקודה שמאלית למטה של המצולע המקורי
+                      .setMaterial(new Material().setKd(0.6).setKs(0.4).setShininess(25))
+                      .setEmission(new Color(BLUE))
+
+              );
+
+// Setting ambient light and adding additional lights
+      scene.setAmbientLight(new AmbientLight(new Color(WHITE), 0.15));
+      scene.lights.add(
+              new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4))
+                      .setKl(4E-4).setKq(2E-5)
+      );
+
+
+      // Set up the camera
+      cameraBuilder.setLocation(new Point(0, 0, 1000))
+              .setVpDistance(1000)
+              .setVpSize(500, 500)
+              .setImageWriter(imageWriter)
+              .build()
+              .renderImage()
+              .writeToImage();
+   }
+
+
 
 }
