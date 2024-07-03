@@ -70,14 +70,14 @@ public class SimpleRayTracer extends RayTracerBase {
         Vector n = gp.geometry.getNormal(gp.point);
         double nv = Util.alignZero(n.dotProduct(v));
         if (nv == 0)
-            return color;
+            return Color.BLACK;
         Material material = gp.geometry.getMaterial();
         for (LightSource lightSource : scene.lights) {
             Vector l = lightSource.getL(gp.point);
             double nl = Util.alignZero(n.dotProduct(l));
             if (nl * nv > 0) { // sign(nl) == sign(nv)
 
-                Double3 ktr = transparency(gp,l,n,nv,lightSource);
+                Double3 ktr = transparency(gp,l,n,lightSource);
                 if (!(ktr.product(k).lowerThan(MIN_CALC_COLOR_K)||ktr.product(k).equals(MIN_CALC_COLOR_K))) {
                     Color iL = lightSource.getIntensity(gp.point).scale(ktr);
                     color = color.add(iL.scale(calcDiffusive(material, nl)),
@@ -176,6 +176,7 @@ public class SimpleRayTracer extends RayTracerBase {
         if (kkx.lowerThan(MIN_CALC_COLOR_K)) return Color.BLACK;
         GeoPoint gp = findClosestIntersection(ray);
         if (gp == null) return scene.background.scale(kx);
+       //
         return calcColor(gp, ray, level - 1, kkx).scale(kx);
     }
 
@@ -222,11 +223,10 @@ public class SimpleRayTracer extends RayTracerBase {
      * @param gp     The intersection point on a geometry object.
      * @param l      The direction from the point to the light source.
      * @param n      The normal vector at the intersection point.
-     * @param nv     The dot product between the normal vector and the direction to the viewer.
      * @param light  The light source.
      * @return The transparency coefficient of the point for the light source.
      */
-    private Double3 transparency(GeoPoint gp, Vector l, Vector n, double nv, LightSource light) {
+    private Double3 transparency(GeoPoint gp, Vector l, Vector n,  LightSource light) {
         Vector lightDirection = l.scale(-1); // from point to light source
         Ray lightRay = new Ray(gp.point, lightDirection,n);
         List<GeoPoint> intersections = scene.geometries.findGeoIntersections(lightRay);
