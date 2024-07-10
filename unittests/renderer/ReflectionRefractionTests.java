@@ -13,10 +13,8 @@ import lighting.AmbientLight;
 import lighting.SpotLight;
 import primitives.*;
 import scene.Scene;
-import java.util.List;
 import lighting.PointLight;
 import geometries.*;
-import lighting.DirectionalLight;
 /** Tests for reflection and transparency functionality, test for partial
  * shadows
  * (with transparency)
@@ -32,6 +30,8 @@ public class ReflectionRefractionTests {
    private final Camera.Builder cameraBuilder = Camera.getBuilder()
            .setDirection(new Vector(0, 0, -1), new Vector(0, 1, 0))
            .setRayTracer(new SimpleRayTracer(scene));
+   // Configure and set the camera
+
 
    /**
     * Produce a picture of a sphere lighted by a spot light
@@ -153,11 +153,7 @@ public class ReflectionRefractionTests {
    public void complexSceneTest() {
       ImageWriter imageWriter = new ImageWriter("ComplexScene", 3000, 3000);
 
-      // Define materials
-      Material shiny = new Material().setKd(0.5).setKs(0.5).setShininess(30);
-      Material reflective = new Material().setKd(0.4).setKs(0.3).setShininess(100).setKr(0.5);
-      Material transparent = new Material().setKd(0.2).setKs(0.2).setShininess(30).setKt(0.6);
-      Material matte = new Material().setKd(0.8).setKs(0.2).setShininess(10);
+
 
       // Add geometries to the scene
       scene.geometries.add(
@@ -227,12 +223,6 @@ public class ReflectionRefractionTests {
    @Test
    public void complexSceneTest2() {
       ImageWriter imageWriter = new ImageWriter("ComplexScene2", 3000, 3000);
-
-      // Define materials
-      Material shiny = new Material().setKd(0.5).setKs(0.5).setShininess(30);
-      Material reflective = new Material().setKd(0.4).setKs(0.3).setShininess(100).setKr(0.5);
-      Material transparent = new Material().setKd(0.2).setKs(0.2).setShininess(30).setKt(0.6);
-      Material matte = new Material().setKd(0.8).setKs(0.2).setShininess(10);
 
       // Add geometries to the scene
       scene.geometries.add(

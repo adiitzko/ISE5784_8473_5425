@@ -12,6 +12,22 @@ public class Point {
     protected final Double3 xyz;
 
     /**
+     * Moves a point on the view plane according to the given displacements.
+     *
+     * @param vUp       The up vector.
+     * @param vRight    The right vector.
+     * @param randomX   The random X displacement.
+     * @param randomY   The random Y displacement.
+     * @param pixelSizeX The size of a pixel in the X direction.
+     * @param pixelSizeY The size of a pixel in the Y direction.
+     * @return The moved point on the view plane.
+     */
+    public Point movePointOnViewPlane(Vector vUp, Vector vRight, double randomX, double randomY, double pixelSizeX, double pixelSizeY) {
+        Vector displacement = vUp.scale(randomX).add(vRight.scale(randomY));
+        Point newPoint = this.add(displacement);
+        return newPoint;
+    }
+    /**
      * Constructor that initializes the point with the specified x, y, and z coordinates.
      *
      * @param x The x-coordinate of the point.
