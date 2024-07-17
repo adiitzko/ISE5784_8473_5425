@@ -139,6 +139,15 @@ public class Camera implements Cloneable {
         return this;
     }
 
+    /**
+     * Constructs a ray from the camera through a specific pixel on the view plane.
+     *
+     * @param nX the number of pixels in the horizontal direction
+     * @param nY the number of pixels in the vertical direction
+     * @param j the horizontal index of the pixel
+     * @param i the vertical index of the pixel
+     * @return the constructed ray from the camera through the specified pixel
+     */
     public Ray constructRay(int nX, int nY, int j, int i)  {      // Implementation of ray construction (not provided in the initial code)
         Point Pc = p0.add(vTo.scale(distance));
 
