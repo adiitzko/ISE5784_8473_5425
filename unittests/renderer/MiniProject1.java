@@ -81,9 +81,9 @@ public class MiniProject1 {
         Point w4 = new Point(-100, -68, -222);
 
         scene.geometries.add(
-                new Sphere(new Point(100, -100, -70), 20)
-                        .setEmission(new Color(200, 100, 0)) // צבע השמש
-                        .setMaterial(new Material().setKd(0.3).setKs(0.4).setKt(0.5).setShininess(20)),
+//                new Sphere(new Point(100, -100, -70), 20)
+//                        .setEmission(new Color(200, 100, 0)) // צבע השמש
+//                        .setMaterial(new Material().setKd(0.3).setKs(0.4).setKt(0.5).setShininess(20)),
 //                new Polygon(S1, S2, S3, S4).setEmission(new Color(GREEN)) //surface
 //                        .setMaterial(new Material().setKd(0.5).setKs(0.8).setKr(1).setShininess(20)),
                 new Polygon(S2, S1, be1, be2) //background
@@ -167,16 +167,16 @@ public class MiniProject1 {
 
         cameraBuilder.setLocation(new Point(0, 0, 1000))
                 .setVpDistance(1000)
-                .setVpSize(200, 200)
+                .setVpSize(300, 300)
                 .setImageWriter(new ImageWriter("afterAntiAliasing", 500, 500))
                 .build()
                 .setRaynum(80)
                 .renderImage()
                 .writeToImage();
 
-        cameraBuilder.setLocation(new Point(0, 0, 800))
+        cameraBuilder.setLocation(new Point(0, 0, 1000))
                 .setVpDistance(1000)
-                .setVpSize(200, 200)
+                .setVpSize(300, 300)
                 .setImageWriter(new ImageWriter("beforeAntiAliasing", 500, 500))
                 .build()
                 .setRaynum(1)

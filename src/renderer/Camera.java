@@ -148,7 +148,7 @@ public class Camera implements Cloneable {
      * @param i the vertical index of the pixel
      * @return the constructed ray from the camera through the specified pixel
      */
-    public Ray constructRay(int nX, int nY, int j, int i)  {      // Implementation of ray construction (not provided in the initial code)
+    private Ray constructRay(int nX, int nY, int j, int i)  {      // Implementation of ray construction (not provided in the initial code)
         Point Pc = p0.add(vTo.scale(distance));
 
         // Calculate the pixel dimensions on the view plane
@@ -430,7 +430,7 @@ public class Camera implements Cloneable {
      * @param i      The Y index of the pixel.
      * @return The list of constructed rays.
      */
-    public List<Ray> constructRays(int nX, int nY, int j, int i) {
+    private List<Ray> constructRays(int nX, int nY, int j, int i) {
         Random random = new Random();
         List<Ray> rays = new LinkedList<>();
 
