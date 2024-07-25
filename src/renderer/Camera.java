@@ -7,8 +7,6 @@ import primitives.Util;
 import primitives.Color;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Random;
-
 import java.util.MissingResourceException;
 
 /**
@@ -23,10 +21,22 @@ public class Camera implements Cloneable {
     private double width = 0, height = 0, distance = 0;
     private ImageWriter imageWriter;
     private RayTracerBase rayTracer;
-    int numOfRays = 1;
+    int antiAliasing = 1;
+    private int numOfThreads = 1;
+    private Point centerPoint;
+    private boolean adaptive = false;
+
+    /**
+     * set the adaptive
+     * @return the Camera object
+     */
+    public Camera setadaptive(boolean adaptive) {
+        this.adaptive = adaptive;
+        return this;
+    }
 
     public Camera setRaynum(int nRays) {
-        numOfRays = nRays;
+        antiAliasing = nRays;
         return this;
     }
     @Override
@@ -148,7 +158,7 @@ public class Camera implements Cloneable {
      * @param i the vertical index of the pixel
      * @return the constructed ray from the camera through the specified pixel
      */
-    private Ray constructRay(int nX, int nY, int j, int i)  {      // Implementation of ray construction (not provided in the initial code)
+    public Ray constructRay(int nX, int nY, int j, int i)  {      // Implementation of ray construction (not provided in the initial code)
         Point Pc = p0.add(vTo.scale(distance));
 
         // Calculate the pixel dimensions on the view plane
@@ -289,12 +299,14 @@ public class Camera implements Cloneable {
          * @throws IllegalArgumentException if distance is non-positive
          */
         public Builder setVpDistance(double distance) {
-            if (distance <= 0) {
-                throw new IllegalArgumentException("Distance must be positive");
-            }
             this.camera.distance = distance;
+            // every time that we change the distance from the view plane
+            // we will calculate the center point of the view plane again
+            camera.centerPoint = camera.p0.add(camera.vTo.scale(this.camera.distance));
             return this;
         }
+
+
 
 
 
@@ -333,24 +345,95 @@ public class Camera implements Cloneable {
             return camera.clone();
         }
     }
+
+//     Renders the image using the configured ray tracer and image writer.
+//
+//     @throws UnsupportedOperationException If the image writer or ray tracer is missing.
+//     */
+//    public Camera renderImage() {
+//        if (this.imageWriter == null)
+//            throw new UnsupportedOperationException("Missing imageWriter");
+//        if (this.rayTracer == null)
+//            throw new UnsupportedOperationException("Missing rayTracerBase");
+//
+//        for (int i = 0; i < this.imageWriter.getNy(); i++) {
+//            for (int j = 0; j < this.imageWriter.getNx(); j++) {
+//                Color color = castRay(j, i);
+//                this.imageWriter.writePixel(j, i, color);
+//            }
+//        }
+//        return this;
+//    }    /**
+//
+
     /**
-
-     Renders the image using the configured ray tracer and image writer.
-
-     @throws UnsupportedOperationException If the image writer or ray tracer is missing.
+     * Renders the image using the current image writer and ray tracer.
+     * The ray tracer find the color and the image writer colors the pixels
+     *
+     * @return This camera instance.
+     * @throws UnsupportedOperationException If either the image writer or the ray tracer is not initialized.
      */
     public Camera renderImage() {
-        if (this.imageWriter == null)
-            throw new UnsupportedOperationException("Missing imageWriter");
-        if (this.rayTracer == null)
-            throw new UnsupportedOperationException("Missing rayTracerBase");
+        // Check if all required camera data is available
+        if (p0 == null || vRight == null || vUp == null || vTo == null || distance == 0
+                || width == 0 || height == 0 || centerPoint == null || imageWriter == null || rayTracer == null) {
+            System.out.println("Debug Info:");
+            System.out.println("p0: " + p0);
+            System.out.println("vRight: " + vRight);
+            System.out.println("vUp: " + vUp);
+            System.out.println("vTo: " + vTo);
+            System.out.println("distance: " + distance);
+            System.out.println("width: " + width);
+            System.out.println("height: " + height);
+            System.out.println("centerPoint: " + centerPoint);
+            System.out.println("imageWriter: " + imageWriter);
+            System.out.println("rayTracer: " + rayTracer);
 
-        for (int i = 0; i < this.imageWriter.getNy(); i++) {
-            for (int j = 0; j < this.imageWriter.getNx(); j++) {
-                Color color = castRay(j, i);
-                this.imageWriter.writePixel(j, i, color);
-            }
+            throw new IllegalStateException("Missing camera data");
         }
+        // Get the number of pixels in X and Y directions from the image writer
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+        // Initialize the Pixel class with the number of rows, columns, and total pixels
+        Pixel.initialize(nY, nX, 1);
+
+        // Check if adaptive mode is enabled
+        if (!adaptive) {
+            // Render the image using regular super-sampling (non-adaptive)
+            // Create multiple threads to process the pixels in parallel
+            while (numOfThreads-- > 0) {
+                new Thread(() -> {
+                    // Iterate over each pixel in the image
+                    for (Pixel pixel = new Pixel(); pixel.nextPixel(); Pixel.pixelDone()) {
+                        // Construct rays for the current pixel and trace them using the ray tracer
+                        List<Ray> rays = constructRays(nX, nY, pixel.col, pixel.row);
+                        Color pixelColor = rayTracer.TraceRays(rays);
+                        // Write the pixel color to the image writer
+                        imageWriter.writePixel(pixel.col, pixel.row, pixelColor);
+                    }
+                }).start();
+            }
+            // Wait for all the threads to finish processing the pixels
+            Pixel.waitToFinish();
+        }
+        else {
+            // Render the image using adaptive super-sampling
+            // Create multiple threads to process the pixels in parallel
+            while (numOfThreads-- > 0) {
+                new Thread(() -> {
+                    // Iterate over each pixel in the image
+                    for (Pixel pixel = new Pixel(); pixel.nextPixel(); Pixel.pixelDone()) {
+                        // Apply adaptive super-sampling to determine the pixel color
+                        Color pixelColor = SuperSampling(nX, nY, pixel.col, pixel.row, antiAliasing, false);
+                        // Write the pixel color to the image writer
+                        imageWriter.writePixel(pixel.col, pixel.row, pixelColor);
+                    }
+                }).start();
+            }
+            // Wait for all the threads to finish processing the pixels
+            Pixel.waitToFinish();
+        }
+        // Return the camera object
         return this;
     }
     /**
@@ -373,6 +456,14 @@ public class Camera implements Cloneable {
         }
         return this;
     }
+    /**
+     * set the threadsCount
+     * @return the Camera object
+     */
+    public Camera setMultiThreading(int threadsCount) {
+        this.numOfThreads = threadsCount;
+        return this;
+    }
 
     /**
      * Writes the image to the output.
@@ -381,6 +472,7 @@ public class Camera implements Cloneable {
      * @return the Camera object for method chaining.
      * @throws MissingResourceException if the imageWriter field is null.
      */
+
     public Camera writeToImage() {
         if (imageWriter == null) {
             throw new MissingResourceException("ImageWriter field cannot be null", Camera.class.getName(), "");
@@ -388,17 +480,18 @@ public class Camera implements Cloneable {
         imageWriter.writeToImage();
         return this;
     }
-    /**
 
+
+    /*
      Casts a ray through a specified pixel and returns the color of the intersection point.
      @param j The x-coordinate of the pixel.
      @param i The y-coordinate of the pixel.
      @return The color of the intersection point.
      */
     private Color castRay(int j, int i) {
-        if (numOfRays ==1){
-        Ray ray = constructRay(this.imageWriter.getNx(),this.imageWriter.getNy(),j,i);
-        return this.rayTracer.traceRay(ray);}
+        if (antiAliasing ==1){
+            List<Ray>  ray = constructRays(this.imageWriter.getNx(),this.imageWriter.getNy(),j,i);
+        return this.rayTracer.traceRay(ray.get(0));}
         else {
             List<Ray> rays = constructRays( this.imageWriter.getNx(),this.imageWriter.getNy(),j,i);
             return (calcColorSum(rays));
@@ -421,60 +514,179 @@ public class Camera implements Cloneable {
         colorSum = colorSum.reduce(rays.size());
         return colorSum;
     }
+//    /**
+//     * Constructs a list of rays for a given image pixel.
+//     *
+//     * @param nX     The number of pixels in the X direction.
+//     * @param nY     The number of pixels in the Y direction.
+//     * @param j      The X index of the pixel.
+//     * @param i      The Y index of the pixel.
+//     * @return The list of constructed rays.
+//     */
+//    private List<Ray> constructRays(int nX, int nY, int j, int i) {
+//        Random random = new Random();
+//        List<Ray> rays = new LinkedList<>();
+//
+//        // Calculate the center point of the image on the view plane
+//        Point imageCenter = p0.add(vTo.scale(distance));
+//
+//        // Calculate the size of each pixel
+//        double pixelSizeX = width / nX;
+//        double pixelSizeY = height / nY;
+//
+//        // Calculate the coordinates of the current pixel relative to the image center
+//        double Xj = (j - (double) (nX - 1) / 2) * pixelSizeX;
+//        double Yi = -(i - (double) (nY - 1) / 2) * pixelSizeY;
+//
+//        // Calculate the point on the view plane corresponding to the current pixel
+//        Point Pij = imageCenter;
+//        if (Util.alignZero(Xj) != 0) {
+//            Pij = Pij.add(vRight.scale(Xj));
+//        }
+//        if (Util.alignZero(Yi) != 0) {
+//            Pij = Pij.add(vUp.scale(Yi));
+//        }
+//
+//        // Calculate the vector from the camera's location to the point on the view plane
+//        Vector Vij = Pij.subtract(p0);
+//        Ray initialRay = new Ray(p0, Vij);
+//        rays.add(initialRay);
+//
+//        // Generate additional rays within the pixel
+//        for (int k = 0; k < antiAliasing; k++) {
+//            // Generate random offsets within the pixel
+//            double x = random.nextDouble() * pixelSizeX - pixelSizeX / 2;
+//            double y = random.nextDouble() * pixelSizeY - pixelSizeY / 2;
+//
+//            // Calculate the new point on the view plane with the random offsets
+//            Point newPoint = Pij.movePointOnViewPlane(vUp, vRight, x, y, pixelSizeX, pixelSizeY);
+//
+//            // Calculate the ray from the camera's location to the new point
+//            Ray newRay = calcRay(newPoint);
+//            rays.add(newRay);
+//        }
+//
+//        return rays;
+//    }
     /**
      * Constructs a list of rays for a given image pixel.
      *
      * @param nX     The number of pixels in the X direction.
      * @param nY     The number of pixels in the Y direction.
-     * @param j      The X index of the pixel.
-     * @param i      The Y index of the pixel.
+     * @param //xPixel      The X index of the pixel.
+     * @param //yPixel      The Y index of the pixel.
      * @return The list of constructed rays.
      */
-    private List<Ray> constructRays(int nX, int nY, int j, int i) {
-        Random random = new Random();
+
+    public List<Ray> constructRays(int nX, int nY, int j, int i) {
         List<Ray> rays = new LinkedList<>();
+        Point centralPixel = getCenterOfPixel(nX, nY, j, i);
+        double rY = height / nY / antiAliasing;
+        double rX = width / nX / antiAliasing;
+        // Variables to store the X and Y offsets of each sub-pixel within the anti-aliasing grid
+        double x, y;
 
-        // Calculate the center point of the image on the view plane
-        Point imageCenter = p0.add(vTo.scale(distance));
-
-        // Calculate the size of each pixel
-        double pixelSizeX = width / nX;
-        double pixelSizeY = height / nY;
-
-        // Calculate the coordinates of the current pixel relative to the image center
-        double Xj = (j - (double) (nX - 1) / 2) * pixelSizeX;
-        double Yi = -(i - (double) (nY - 1) / 2) * pixelSizeY;
-
-        // Calculate the point on the view plane corresponding to the current pixel
-        Point Pij = imageCenter;
-        if (Util.alignZero(Xj) != 0) {
-            Pij = Pij.add(vRight.scale(Xj));
+        for (int rowNumber = 0; rowNumber < antiAliasing; rowNumber++) {
+            for (int colNumber = 0; colNumber < antiAliasing; colNumber++) {
+                // Calculate the X and Y offsets for the current sub-pixel
+                y = -(rowNumber - (antiAliasing - 1d) / 2) * rY;
+                x = (colNumber - (antiAliasing - 1d) / 2) * rX;
+                // Calculate the position of the current sub-pixel within the pixel
+                Point pIJ = centralPixel;
+                if (y != 0) pIJ = pIJ.add(vUp.scale(y));
+                if (x != 0) pIJ = pIJ.add(vRight.scale(x));
+                // Construct a ray from the camera position to the current sub-pixel
+                rays.add(new Ray(p0, pIJ.subtract(p0)));
+            }
         }
-        if (Util.alignZero(Yi) != 0) {
-            Pij = Pij.add(vUp.scale(Yi));
-        }
-
-        // Calculate the vector from the camera's location to the point on the view plane
-        Vector Vij = Pij.subtract(p0);
-        Ray initialRay = new Ray(p0, Vij);
-        rays.add(initialRay);
-
-        // Generate additional rays within the pixel
-        for (int k = 0; k < numOfRays; k++) {
-            // Generate random offsets within the pixel
-            double x = random.nextDouble() * pixelSizeX - pixelSizeX / 2;
-            double y = random.nextDouble() * pixelSizeY - pixelSizeY / 2;
-
-            // Calculate the new point on the view plane with the random offsets
-            Point newPoint = Pij.movePointOnViewPlane(vUp, vRight, x, y, pixelSizeX, pixelSizeY);
-
-            // Calculate the ray from the camera's location to the new point
-            Ray newRay = calcRay(newPoint);
-            rays.add(newRay);
-        }
-
         return rays;
     }
+    /**
+     * Checks the color of the pixel with the help of individual rays and averages between them and only
+     * if necessary continues to send beams of rays in recursion
+     * @param nX amount of pixels by length
+     * @param nY amount of pixels by width
+     * @param j The position of the pixel relative to the y-axis
+     * @param i The position of the pixel relative to the x-axis
+     * @param numOfRays The amount of rays sent
+     * @return Pixel color
+     */
+    private Color SuperSampling(int nX, int nY, int j, int i,  int numOfRays, boolean adaptiveAlising)  {
+        // Get the right and up vectors of the camera
+        Vector Vright = vRight;
+        Vector Vup = vUp;
+        // Get the location of the camera
+        Point cameraLoc = this.getP0();
+        // Calculate the number of rays in each row and column
+        int numOfRaysInRowCol = (int)Math.floor(Math.sqrt(numOfRays));
+        // If the number of rays is 1, perform regular ray tracing
+        if(numOfRaysInRowCol == 1)
+            return rayTracer.traceRay(constructRayThroughPixel(nX, nY, j, i));
+        // Calculate the center point of the current pixel
+        Point pIJ = getCenterOfPixel(nX, nY, j, i);
+        // Calculate the height and width ratios of the pixel
+        double rY = Util.alignZero(height / nY);
+        double rX = Util.alignZero(width / nX);
+
+        // Calculate the pixel row and column ratios
+        double PRy = rY/numOfRaysInRowCol;
+        double PRx = rX/numOfRaysInRowCol;
+
+        if (adaptiveAlising)
+            return rayTracer.AdaptiveSuperSamplingRec(pIJ, rX, rY, PRx, PRy,cameraLoc,Vright, Vup,null);
+        else
+            return rayTracer.RegularSuperSampling(pIJ, rX, rY, PRx, PRy,cameraLoc,Vright, Vup,null);
+    }
+
+    /**
+     * get the center point of the pixel in the view plane
+     * @param nX number of pixels in the width of the view plane
+     * @param nY number of pixels in the height of the view plane
+     * @param j  index row in the view plane
+     * @param i  index column in the view plane
+     * @return the center point of the pixel
+     */
+    private Point getCenterOfPixel(int nX, int nY, int j, int i) {
+        // calculate the ratio of the pixel by the height and by the width of the view plane
+        // the ratio Ry = h/Ny, the height of the pixel
+        double rY = Util.alignZero(height / nY);
+        // the ratio Rx = w/Nx, the width of the pixel
+        double rX = Util.alignZero(width / nX);
+
+        // Xj = (j - (Nx -1)/2) * Rx
+        double xJ = Util.alignZero((j - ((nX - 1d) / 2d)) * rX);
+        // Yi = -(i - (Ny - 1)/2) * Ry
+        double yI = Util.alignZero(-(i - ((nY - 1d) / 2d)) * rY);
+
+        Point pIJ = centerPoint;
+
+        if (!Util.isZero(xJ)) {
+            pIJ = pIJ.add(vRight.scale(xJ));
+        }
+        if (!Util.isZero(yI)) {
+            pIJ = pIJ.add(vUp.scale(yI));
+        }
+        return pIJ;
+    }
+
+    /**
+     * construct ray through a pixel in the view plane
+     * nX and nY create the resolution
+     * @param nX number of pixels in the width of the view plane
+     * @param nY number of pixels in the height of the view plane
+     * @param j  index row in the view plane
+     * @param i  index column in the view plane
+     * @return ray that goes through the pixel (j, i)  Ray(p0, Vi,j)
+     */
+    public Ray constructRayThroughPixel(int nX, int nY, int j, int i) {
+        Point pIJ = getCenterOfPixel(nX, nY, j, i); // center point of the pixel
+
+        //Vi,j = Pi,j - P0, the direction of the ray to the pixel(j, i)
+        Vector vIJ = pIJ.subtract(p0);
+        return new Ray(p0, vIJ);
+    }
+
+
     /**
      * Calculates a ray given a point.
      *
@@ -485,5 +697,6 @@ public class Camera implements Cloneable {
         Vector newVector = point.subtract(p0);
         return new Ray(p0, newVector);
     }
+
 
 }
