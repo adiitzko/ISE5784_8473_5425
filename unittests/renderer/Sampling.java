@@ -117,6 +117,7 @@ public class Sampling {
         Point D = new Point(-16, -29.36, -16);
 
         Point sideLeft1 = new Point(-22, -1, -50);
+
         Point sideLeft2 = new Point(-21.5, -1, -50);
 
         Point sideLeft1Back = new Point(-28, 5, -60);
@@ -498,29 +499,6 @@ public class Sampling {
         //the sunlight
         scene.lights.add(new DirectionalLight(new Color(200, 300, 100).scale(0.8), new Vector(-1, -2, -8)));
 
-/*
-// with soft shadow featre
-        //light for balloon coloring
-        scene4.lights.add(new SpotLight(new Color(600, 700, 400), new Point(-2, 28, -50), new Vector(0, 1, 0)).setSize(30));
-
-        //inside basket light
-        scene4.lights.add(new PointLight(new Color(200, 100, 100), new Point(0, -40, -50)).setSize(40));
-
-        //the second shadow for baloon
-        scene4.lights.add(new PointLight(new Color(105, 100, 100).scale(0.5), new Point(10, 10, 10)).setKq(0).setKl(0).setSize(45));
-
-        //street light for pinwheel
-        scene4.lights.add(new PointLight(new Color(10,10,10), new Point(-40,-20,0)).setSize(30));
-        //th light for the baloon decoration
-        scene4.lights.add(new PointLight(new Color(40,40,40), new Point(-20,0,1001)).setSize(0));
-
-
- */
-
-
-
-
-
 
         //without soft shadows
         //light for balloon coloring
@@ -547,23 +525,36 @@ public class Sampling {
 
 
 
-        cameraBuilder.setLocation(new Point(0, 0, 980))
-                .setVpDistance(1300)
-                .setVpSize(200, 200)
-                .setImageWriter(new ImageWriter("bHotBalloon", 500, 500))
-                .build()
-                .setRaynum(1)
-                .renderImage()
-                .writeToImage();
+//        cameraBuilder.setLocation(new Point(0, 0, 980))
+//                .setVpDistance(1300)
+//                .setVpSize(200, 200)
+//                .setImageWriter(new ImageWriter("bHotBalloon", 300, 300))
+//                .build()
+//                .setRaynum(1)
+//                .setMultiThreading(1)
+//                .setadaptive(false)
+//                .renderImage()
+//                .writeToImage();
+//
+//        cameraBuilder.setLocation(new Point(0, 0, 980))
+//                .setVpDistance(1300)
+//                .setVpSize(200, 200)
+//                .setImageWriter(new ImageWriter("aHotBalloon", 300, 300))
+//                .build()
+//                .setRaynum(80)
+//                .setMultiThreading(4)
+//                .setadaptive(false)
+//                .renderImage()
+//                .writeToImage();
 
         cameraBuilder.setLocation(new Point(0, 0, 980))
                 .setVpDistance(1300)
                 .setVpSize(200, 200)
-                .setImageWriter(new ImageWriter("aHotBalloon", 500, 500))
+                .setImageWriter(new ImageWriter("aHotBalloon", 300, 300))
                 .build()
-                .setRaynum(80)
+                .setRaynum(16)
                 .setMultiThreading(20)
-                .setadaptive(true)
+                .setadaptive(false)
                 .renderImage()
                 .writeToImage();
     }

@@ -374,23 +374,6 @@ public class Camera implements Cloneable {
      * @throws UnsupportedOperationException If either the image writer or the ray tracer is not initialized.
      */
     public Camera renderImage() {
-        // Check if all required camera data is available
-        if (p0 == null || vRight == null || vUp == null || vTo == null || distance == 0
-                || width == 0 || height == 0 || centerPoint == null || imageWriter == null || rayTracer == null) {
-            System.out.println("Debug Info:");
-            System.out.println("p0: " + p0);
-            System.out.println("vRight: " + vRight);
-            System.out.println("vUp: " + vUp);
-            System.out.println("vTo: " + vTo);
-            System.out.println("distance: " + distance);
-            System.out.println("width: " + width);
-            System.out.println("height: " + height);
-            System.out.println("centerPoint: " + centerPoint);
-            System.out.println("imageWriter: " + imageWriter);
-            System.out.println("rayTracer: " + rayTracer);
-
-            throw new IllegalStateException("Missing camera data");
-        }
         // Get the number of pixels in X and Y directions from the image writer
         int nX = imageWriter.getNx();
         int nY = imageWriter.getNy();
@@ -424,7 +407,7 @@ public class Camera implements Cloneable {
                     // Iterate over each pixel in the image
                     for (Pixel pixel = new Pixel(); pixel.nextPixel(); Pixel.pixelDone()) {
                         // Apply adaptive super-sampling to determine the pixel color
-                        Color pixelColor = SuperSampling(nX, nY, pixel.col, pixel.row, antiAliasing, false);
+                        Color pixelColor = SuperSampling(nX, nY, pixel.col, pixel.row, antiAliasing, true);
                         // Write the pixel color to the image writer
                         imageWriter.writePixel(pixel.col, pixel.row, pixelColor);
                     }
@@ -514,60 +497,7 @@ public class Camera implements Cloneable {
         colorSum = colorSum.reduce(rays.size());
         return colorSum;
     }
-//    /**
-//     * Constructs a list of rays for a given image pixel.
-//     *
-//     * @param nX     The number of pixels in the X direction.
-//     * @param nY     The number of pixels in the Y direction.
-//     * @param j      The X index of the pixel.
-//     * @param i      The Y index of the pixel.
-//     * @return The list of constructed rays.
-//     */
-//    private List<Ray> constructRays(int nX, int nY, int j, int i) {
-//        Random random = new Random();
-//        List<Ray> rays = new LinkedList<>();
-//
-//        // Calculate the center point of the image on the view plane
-//        Point imageCenter = p0.add(vTo.scale(distance));
-//
-//        // Calculate the size of each pixel
-//        double pixelSizeX = width / nX;
-//        double pixelSizeY = height / nY;
-//
-//        // Calculate the coordinates of the current pixel relative to the image center
-//        double Xj = (j - (double) (nX - 1) / 2) * pixelSizeX;
-//        double Yi = -(i - (double) (nY - 1) / 2) * pixelSizeY;
-//
-//        // Calculate the point on the view plane corresponding to the current pixel
-//        Point Pij = imageCenter;
-//        if (Util.alignZero(Xj) != 0) {
-//            Pij = Pij.add(vRight.scale(Xj));
-//        }
-//        if (Util.alignZero(Yi) != 0) {
-//            Pij = Pij.add(vUp.scale(Yi));
-//        }
-//
-//        // Calculate the vector from the camera's location to the point on the view plane
-//        Vector Vij = Pij.subtract(p0);
-//        Ray initialRay = new Ray(p0, Vij);
-//        rays.add(initialRay);
-//
-//        // Generate additional rays within the pixel
-//        for (int k = 0; k < antiAliasing; k++) {
-//            // Generate random offsets within the pixel
-//            double x = random.nextDouble() * pixelSizeX - pixelSizeX / 2;
-//            double y = random.nextDouble() * pixelSizeY - pixelSizeY / 2;
-//
-//            // Calculate the new point on the view plane with the random offsets
-//            Point newPoint = Pij.movePointOnViewPlane(vUp, vRight, x, y, pixelSizeX, pixelSizeY);
-//
-//            // Calculate the ray from the camera's location to the new point
-//            Ray newRay = calcRay(newPoint);
-//            rays.add(newRay);
-//        }
-//
-//        return rays;
-//    }
+
     /**
      * Constructs a list of rays for a given image pixel.
      *

@@ -257,7 +257,7 @@ public class SimpleRayTracer extends RayTracerBase {
      */
     @Override
     public Color TraceRays(List<Ray> rays) {
-        Color color = new Color(0,0,0);
+        Color color = Color.BLACK;
         for (Ray ray : rays) {
             GeoPoint clossestGeoPoint = findClosestIntersection(ray);
             if (clossestGeoPoint == null)
@@ -293,13 +293,11 @@ public class SimpleRayTracer extends RayTracerBase {
         List<primitives.Color> colorList = new LinkedList<>();
         Point tempCorner;
         Ray tempRay;
-        // Iterate over the corners of the pixel and perform sub-sampling
         for (int i = -1; i <= 1; i += 2) {
             for (int j = -1; j <= 1; j += 2) {
                 tempCorner = centerP.add(Vright.scale(i * Width / 2)).add(Vup.scale(j * Height / 2));
                 cornersList.add(tempCorner);
-                // Check if the sub-pixel's corner is already sampled
-                if (prePoints == null || !isInList(prePoints, tempCorner)) {
+                if (prePoints == null || !Util.isInList(prePoints, tempCorner)) {
                     tempRay = new Ray(cameraLoc, tempCorner.subtract(cameraLoc));
                     nextCenterPList.add(centerP.add(Vright.scale(i * Width / 4)).add(Vup.scale(j * Height / 4)));
                     colorList.add(traceRay(tempRay));
@@ -365,7 +363,7 @@ public class SimpleRayTracer extends RayTracerBase {
                 Point subPixelPoint = centerP.add(Right.scale(randomX - Width / 2)).add(Vup.scale(randomY - Height / 2));
 
                 // Check if the sub-pixel's point is already sampled
-                if (prePoints == null || !isInList(prePoints, subPixelPoint)) {
+                if (prePoints == null || !Util.isInList(prePoints, subPixelPoint)) {
                     Ray ray = new Ray(cameraLoc, subPixelPoint.subtract(cameraLoc));
                     colorList.add(traceRay(ray));
                 }
@@ -385,17 +383,5 @@ public class SimpleRayTracer extends RayTracerBase {
         // Reduce the color by dividing by the number of sub-pixels
         return averageColor.reduce(colorList.size());
     }
-    /**
-     * Find a point in the list
-     *
-     * @param pointsList the list
-     * @param point      the point that we look for
-     */
-    private boolean isInList(List<Point> pointsList, Point point) {
-        for (Point tempPoint : pointsList) {
-            if (point.equals(tempPoint))
-                return true;
-        }
-        return false;
-    }
+
 }

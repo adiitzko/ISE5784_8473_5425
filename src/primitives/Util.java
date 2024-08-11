@@ -1,5 +1,7 @@
 package primitives;
 
+import java.util.List;
+
 /** Util class is used for some internal utilities, e.g. controlling accuracy
  * @author Dan */
 public final class Util {
@@ -60,4 +62,17 @@ public final class Util {
         return Math.random() * (max - min) + min;
     }
 
+    /**
+     * Find a point in the list
+     *
+     * @param pointsList the list
+     * @param point      the point that we look for
+     */
+    public static boolean isInList(List<Point> pointsList, Point point) {
+        for (Point tempPoint : pointsList) {
+            if (point.equals(tempPoint))
+                return true;
+        }
+        return false;
+    }
 }
